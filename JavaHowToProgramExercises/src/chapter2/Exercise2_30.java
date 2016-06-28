@@ -1,5 +1,5 @@
 // Grzegorz Koñczak, 27.06.2016
-// Exercise number 2.28 page 108
+// Exercise number 2.30 page 109
 // Exercise from Java:How to program 10th edition
 
 package chapter2;
