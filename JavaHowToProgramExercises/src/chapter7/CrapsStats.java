@@ -17,7 +17,7 @@ public class CrapsStats {
 		ArrayList<PlaySummary> summaries = new ArrayList<>();
 
 		// Play games in loop and store summary of each game in AraayList
-		for (int i = 0; i < 1000000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			summaries.add(game.play());
 		}
 
