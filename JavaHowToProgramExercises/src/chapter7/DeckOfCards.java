@@ -8,7 +8,10 @@ import java.security.SecureRandom;
 
 public class DeckOfCards {
 
-	public enum CardCombination {NOTHING, PAIR, TWO_PAIR, THREE_OF_KIND, FOUR_OF_KIND, FLUSH, STRAIGHT, FULL_HOUSE}; // Possible 5 card hand combinations
+	public enum CardCombination {
+		NOTHING, PAIR, TWO_PAIR, THREE_OF_KIND, FOUR_OF_KIND, FLUSH, STRAIGHT, FULL_HOUSE
+	}; // Possible 5 card hand combinations
+
 	private Card[] deck; // array of Card objects
 	private int currentCard; // index of next Card to be dealt (0-51)
 	private static final int NUMBER_OF_CARDS = 52; // constant # of Cards
@@ -54,66 +57,133 @@ public class DeckOfCards {
 		else
 			return null; // return null to indicate that all Cards were dealt
 	}
-	
-	
+
 	// Method for checking value of poker hand
 	// TODO Checks for combinations: two pair, straight, full house
-	public CardCombination checkHand(Card[] hand){
-		
+	public CardCombination checkHand(Card[] hand) {
+
 		// Check for possible flush
 		boolean suitCheck = true;
 		String[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
-		for (int i = 0; i < 4; i++){
-			for (int j = 0; j < 5; j++){
+		for (int i = 0; i < 4; i++) {
+			suitCheck = true;
+			for (int j = 0; j < 5; j++) {
 				if (hand[j].getSuit() != suits[i])
 					suitCheck = false;
 			}
-			if(suitCheck)
+			if (suitCheck)
 				return CardCombination.FLUSH;
 		}
-		
+
 		// Check for four of kind
 		boolean isFour = false;
-		for (int i = 0; i < 5; i++){
-			for (int j = i + 1; j < 5; j++){
+		for (int i = 0; i < 5; i++) {
+			for (int j = i + 1; j < 5; j++) {
 				if (hand[i].getFace() == hand[j].getFace())
-					for (int k = 0; k < 5; k++){
+					for (int k = 0; k < 5; k++) {
 						if (k != i && k != j && hand[k].getFace() == hand[i].getFace())
-							for (int l = 0; l < 5; l++){
+							for (int l = 0; l < 5; l++) {
 								if (l != i && l != j && l != k && hand[l].getFace() == hand[i].getFace())
 									isFour = true;
 							}
 					}
 			}
-			if(isFour)
+			if (isFour)
 				return CardCombination.FOUR_OF_KIND;
 		}
+
+		// Check for straight
+		String[] faces = { "Ace", "Deuce", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack",
+				"Queen", "King" };
 		
+		// Sort the hand
+		int swapCounter = 0;
+		Card[] sortedHand = new Card[5];
+		for (int i = 0; i < faces.length; i++){
+			for (int j = 0; j < 5; j++){
+				if (faces[i] == hand[j].getFace()){
+					sortedHand[0 + swapCounter] = hand[j];
+					swapCounter++;
+				}
+			}
+		}
+
+		// Check sorted hand for straight
+		for (int i = 0; i < 5; i++){
+			for (int j = 0; j < 9; j++){
+				if (sortedHand[i].getFace() == faces[j]){
+					int count = 0;
+					for (int k = 1; k < 5; k++){
+						if (sortedHand[k].getFace() == faces[j + k]){
+							count++;
+						}
+					}
+					if (count == 4 ||
+							((sortedHand[0].getFace() == "Ten") && (sortedHand[4].getFace() == "Ace"))){
+						return CardCombination.STRAIGHT;
+					}
+				}
+			}
+		}
+		
+		
+		// Check for full house
+		boolean isFull = false;
+		for (int i = 0; i < 5; i++) {
+			for (int j = i + 1; j < 5; j++) {
+				if (hand[i].getFace() == hand[j].getFace())
+					for (int k = 0; k < 5; k++)
+						if (k != i && k != j && hand[k].getFace() == hand[i].getFace())
+							for (int l = 0; l < 5; l++)
+								for (int m = l + 1; m < 5; m++)
+									if (hand[l].getFace() == hand[m].getFace() && (l != i && l != j && l != k)
+											&& (m != i && m != j && m != k))
+										isFull = true;
+
+			}
+			if (isFull)
+				return CardCombination.FULL_HOUSE;
+		}
+
 		// Check for three of kind
 		boolean isThree = false;
-		for (int i = 0; i < 5; i++){
-			for (int j = i + 1; j < 5; j++){
+		for (int i = 0; i < 5; i++) {
+			for (int j = i + 1; j < 5; j++) {
 				if (hand[i].getFace() == hand[j].getFace())
-					for (int k = 0; k < 5; k++){
+					for (int k = 0; k < 5; k++) {
 						if (k != i && k != j && hand[k].getFace() == hand[i].getFace())
 							isThree = true;
 					}
 			}
-			if(isThree)
+			if (isThree)
 				return CardCombination.THREE_OF_KIND;
 		}
-		
+
+		// Check for two pair
+		boolean isTwoPair = false;
+		for (int i = 0; i < 5; i++) {
+			for (int j = i + 1; j < 5; j++) {
+				if (hand[i].getFace() == hand[j].getFace())
+					for (int k = 0; k < 5; k++)
+						for (int l = k + 1; l < 5; l++)
+							if (hand[k].getFace() == hand[l].getFace() && (k != i && k != j) && (l != i && l != j))
+								isTwoPair = true;
+			}
+			if (isTwoPair)
+				return CardCombination.TWO_PAIR;
+		}
+
 		// Check for pair
 		boolean isPair = false;
-		for (int i = 0; i < 5; i++){
-			for (int j = i + 1; j < 5; j++){
+		for (int i = 0; i < 5; i++) {
+			for (int j = i + 1; j < 5; j++) {
 				if (hand[i].getFace() == hand[j].getFace())
 					isPair = true;
 			}
-			if(isPair)
+			if (isPair)
 				return CardCombination.PAIR;
 		}
-		
+
 		return CardCombination.NOTHING;
 	}
 } // end class DeckOfCards
