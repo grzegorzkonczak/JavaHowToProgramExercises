@@ -11,7 +11,7 @@ public class PixelQuantization {
 		int[] pictureRow = {12,22,31,74,56,123,60,195,188,163,1,7,13,44,50};
 		
 		for(int pixel : pictureRow){
-			System.out.print(pixel + " ");
+			System.out.printf("%-5d", pixel);
 		}
 		System.out.println();
 		
@@ -39,7 +39,7 @@ public class PixelQuantization {
 		}
 		
 		for(int pixel : pictureRow){
-			System.out.print(pixel + " ");
+			System.out.printf("%-5d", pixel);
 		}
 	}
 }
