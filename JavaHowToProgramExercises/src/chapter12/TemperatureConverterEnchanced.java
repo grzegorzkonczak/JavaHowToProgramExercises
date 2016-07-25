@@ -1,5 +1,5 @@
 // Grzegorz Koñczak, 22.07.2016
-// Exercise number 12.12 page 592
+// Exercise number 12.13 page 592
 // Exercise from Java:How to program 10th edition
 
 package chapter12;
@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import java.awt.GridLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.UIManager;
 
 public class TemperatureConverterEnchanced {
 
@@ -33,6 +34,11 @@ public class TemperatureConverterEnchanced {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -182,7 +188,7 @@ public class TemperatureConverterEnchanced {
 					}
 				} catch (NumberFormatException exeption) {
 					// Show error message about wrong input
-					JOptionPane.showMessageDialog(frame, "Input Something! And it should be number...", "Wrong Input", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frame, "Input Something! And it should be integer number...", "Wrong Input", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
