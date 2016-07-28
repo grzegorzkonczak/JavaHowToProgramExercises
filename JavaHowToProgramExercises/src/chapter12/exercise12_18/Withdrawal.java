@@ -38,10 +38,7 @@ public class Withdrawal extends Transaction
       BankDatabase bankDatabase = getBankDatabase(); 
       Screen screen = getScreen();
 
-      // loop until cash is dispensed or the user cancels
-      do
-      {
-         // obtain a chosen withdrawal amount from the user 
+
          amount = displayMenuOfAmounts();
          
          // check whether user chose a withdrawal amount or canceled
@@ -84,13 +81,12 @@ public class Withdrawal extends Transaction
             screen.displayMessageLine("\nCanceling transaction...");
             return; // return to main menu because user canceled
          } // end else
-      } while (!cashDispensed);
 
    } // end method execute
 
    // display a menu of withdrawal amounts and the option to cancel;
    // return the chosen amount or 0 if the user chooses to cancel
-   private int displayMenuOfAmounts()
+   public int displayMenuOfAmounts()
    {
       int userChoice = 0; // local variable to store return value
 

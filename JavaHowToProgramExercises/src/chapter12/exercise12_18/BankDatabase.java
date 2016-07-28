@@ -33,15 +33,27 @@ public class BankDatabase
 
    // determine whether user-specified account number and PIN match
    // those of an account in the database
-   public boolean authenticateUser(int userAccountNumber, int userPIN)
+   public boolean authenticateAccount(int userAccountNumber)
    {
       // attempt to retrieve the account with the account number
       Account userAccount = getAccount(userAccountNumber);
 
       // if account exists, return result of Account method validatePIN
       if (userAccount != null)
-         return userAccount.validatePIN(userPIN);
+         return true;
       else
+         return false; // account number not found, so return false
+   } // end method authenticateUser
+   
+   public boolean authenticatePin(int userPin, int userAccountNumber)
+   {
+      // attempt to retrieve the account with the account number
+      Account userAccount = getAccount(userAccountNumber);
+
+      // if account exists, return result of Account method validatePIN
+      if (userAccount.validatePIN(userPin)){
+         return true;
+      }else
          return false; // account number not found, so return false
    } // end method authenticateUser
 

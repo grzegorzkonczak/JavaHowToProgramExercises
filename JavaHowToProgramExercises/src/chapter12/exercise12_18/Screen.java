@@ -10,18 +10,31 @@ public class Screen
    // displays a message without a carriage return
    public void displayMessage(String message) 
    {
-      System.out.print(message); 
+      ATMGUI.displayMessage(message);
+   } // end method displayMessage
+   
+   // displays a message without a carriage return
+   public void appendMessage(String message) 
+   {
+      ATMGUI.appendMessage(message);
    } // end method displayMessage
 
+   public void appendMessageLine(String message) 
+   {
+      ATMGUI.appendMessage(message);
+      ATMGUI.appendMessage("\n");
+   } // end method displayMessage
+   
    // display a message with a carriage return
    public void displayMessageLine(String message) 
    {
-      System.out.println(message);   
+	   ATMGUI.displayMessage(message);
+	   ATMGUI.appendMessage("\n");
    } // end method displayMessageLine
 
    // display a dollar amount
-   public void displayDollarAmount(double amount)
+   public void appendDollarAmount(double amount)
    {
-      System.out.printf("$%,.2f", amount);   
+	   ATMGUI.appendMessage(String.format("$%,.2f", amount));   
    } // end method displayDollarAmount 
 } // end class Screen
