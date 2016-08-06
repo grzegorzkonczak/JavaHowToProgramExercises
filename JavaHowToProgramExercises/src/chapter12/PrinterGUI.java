@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
+import net.miginfocom.swing.MigLayout;
+
 public class PrinterGUI {
 
 	private JFrame frame;
