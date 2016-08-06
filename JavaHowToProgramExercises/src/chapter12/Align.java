@@ -4,24 +4,15 @@
 
 package chapter12;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-import java.awt.FlowLayout;
-import javax.swing.JCheckBox;
-import javax.swing.BoxLayout;
-import java.awt.BorderLayout;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.JButton;
-import java.awt.GridLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormSpecs;
-import com.jgoodies.forms.layout.RowSpec;
-import net.miginfocom.swing.MigLayout;
 
 public class Align {
 
