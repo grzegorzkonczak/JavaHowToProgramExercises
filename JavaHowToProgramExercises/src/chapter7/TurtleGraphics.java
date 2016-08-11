@@ -134,7 +134,7 @@ public class TurtleGraphics {
 		}
 		
 		// Moving turtle in west direction (with or without drawing along the way)
-		if (turtleFaceing == Facing.WEST) {
+		if (turtleFaceing == Facing.EAST) {
 			if (penDown) {
 				for (int i = 0; i < distance; i++) {
 					board[turtleLocation[0]][turtleLocation[1]] = 1;
@@ -147,7 +147,7 @@ public class TurtleGraphics {
 		}
 		
 		// Moving turtle in east direction (with or without drawing along the way)
-		if (turtleFaceing == Facing.EAST) {
+		if (turtleFaceing == Facing.WEST) {
 			if (penDown) {
 				for (int i = 0; i < distance; i++) {
 					board[turtleLocation[0]][turtleLocation[1]] = 1;
