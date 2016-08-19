@@ -4,8 +4,6 @@
 
 package chapter14;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
 
 public class CookingWithHealthierIngredientsMain {
