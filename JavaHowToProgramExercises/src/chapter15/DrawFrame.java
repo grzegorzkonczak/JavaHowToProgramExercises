@@ -19,6 +19,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import chapter16.colorChooser.ColorChooser;
+
 public class DrawFrame extends JFrame {
 
 	private JButton undo;
@@ -32,11 +34,8 @@ public class DrawFrame extends JFrame {
 	private JButton load;
 
 	private final static String[] shapes = { "Line", "Oval", "Rectangle" };
-	private final static String[] colorNames = { "Black", "Blue", "Cyan", "Dark Gray", "Gray", "Green", "Light Gray",
-			"Magneta", "Orange", "Pink", "Red", "White", "Yellow" };
-	private final static Color[] colors = { Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY, Color.GRAY,
-			Color.GREEN, Color.LIGHT_GRAY, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED, Color.WHITE,
-			Color.YELLOW };
+	private final static ColorChooser chooser = new ColorChooser();
+	private final static String[] colorNames = chooser.getColorNames();
 
 	public DrawFrame() {
 
@@ -78,8 +77,7 @@ public class DrawFrame extends JFrame {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				panel.setCurrentColor(colors[colorChooser.getSelectedIndex()]);
-
+				panel.setCurrentColor(chooser.getColor((String)colorChooser.getSelectedItem()));
 			}
 		});
 

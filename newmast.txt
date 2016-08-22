@@ -1,0 +1,5 @@
+100 Alan Jones 375,31
+300 Mary Smith 173,19
+500 Sam Sharp -20,17
+700 Suzy Green 68,09
+1000 Grzegorz Koñczak 1000,30
