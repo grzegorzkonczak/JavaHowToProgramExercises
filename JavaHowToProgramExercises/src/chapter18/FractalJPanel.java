@@ -1,7 +1,9 @@
+// Grzegorz Koñczak, 24.08.2016
+// Exercise number 18.19 page 849
+// Exercise from Java:How to program 10th edition
+
 package chapter18;
 
-// Fig. 18.18: FractalJPanel.java
-// Drawing the "Lo feather fractal" using recursion.
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,7 +11,6 @@ import javax.swing.JPanel;
 
 public class FractalJPanel extends JPanel
 {
-   private Color color; // stores color used to draw fractal
    private int level;   // stores current level of fractal
 
    private static final int WIDTH = 400;  // defines width of JPanel
@@ -19,7 +20,6 @@ public class FractalJPanel extends JPanel
    // and set up JPanel specifications
    public FractalJPanel(int currentLevel)
    {
-      color = Color.BLUE; 
       level = currentLevel; // set initial fractal level
       setBackground(Color.WHITE);
       setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -58,15 +58,18 @@ public class FractalJPanel extends JPanel
       super.paintComponent(g);
 
       // draw fractal pattern
-      g.setColor(color);
-      drawFractal(level, 100, 90, 290, 200, g); 
+      g.setColor(Color.BLUE);
+      drawFractal(level, 100, 90, getWidth()/2, getHeight()/2, g);
+      g.setColor(Color.RED);
+      drawFractal(level, 300, 90, getWidth()/2, getHeight()/2, g);
+      g.setColor(Color.GREEN);
+      drawFractal(level, 340, 240, getWidth()/2, getHeight()/2, g);
+      g.setColor(Color.YELLOW);
+      drawFractal(level, 200, 330, getWidth()/2, getHeight()/2, g);
+      g.setColor(Color.PINK);
+      drawFractal(level, 60, 240, getWidth()/2, getHeight()/2, g);
    } 
 
-   // set the drawing color to c
-   public void setColor(Color c)
-   {
-      color = c;
-   } 
     
    // set the new level of recursion
    public void setLevel(int currentLevel)

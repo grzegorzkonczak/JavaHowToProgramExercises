@@ -1,7 +1,9 @@
+// Grzegorz Koñczak, 24.08.2016
+// Exercise number 18.19 page 849
+// Exercise from Java:How to program 10th edition
+
 package chapter18;
 
-// Fig. 18.19: Fractal.java
-// Fractal user interface.
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -32,29 +34,6 @@ public class Fractal extends JFrame
       // set up control panel
       final JPanel controlJPanel = new JPanel();
       controlJPanel.setLayout(new FlowLayout());
-
-      // set up color button and register listener
-      final JButton changeColorJButton = new JButton("Color");
-      controlJPanel.add(changeColorJButton);
-      changeColorJButton.addActionListener(
-         new ActionListener() // anonymous inner class
-         {
-            // process changeColorJButton event
-            @Override
-            public void actionPerformed(ActionEvent event)
-            {
-               Color color = JColorChooser.showDialog(
-                  Fractal.this, "Choose a color", Color.BLUE);
-
-               // set default color, if no color is returned
-               if (color == null)
-                  color = Color.BLUE;
-
-               drawSpace.setColor(color);
-               repaint();
-            } 
-         } // end anonymous inner class
-      ); // end addActionListener
 
       // set up decrease level button to add to control panel and 
       // register listener
