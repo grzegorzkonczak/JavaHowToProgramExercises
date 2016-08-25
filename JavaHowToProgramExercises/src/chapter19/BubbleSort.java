@@ -1,4 +1,4 @@
-// Grzegorz Koñczak, 23.08.2016
+// Grzegorz Koñczak, 24.08.2016
 // Exercise number 19.5/6 page 878
 // Exercise from Java:How to program 10th edition
 
