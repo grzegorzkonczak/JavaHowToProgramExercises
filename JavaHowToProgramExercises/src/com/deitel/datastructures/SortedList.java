@@ -1,5 +1,5 @@
 // Grzegorz Koñczak, 27.08.2016
-// Exercise number 21.7 page 946
+// Exercise number 21.7/8 page 946
 // Exercise from Java:How to program 10th edition
 
 package com.deitel.datastructures;
@@ -83,7 +83,7 @@ public class SortedList<T extends Comparable<T>> {
 				first.setNextNode(second);
 			} else {
 				if (currentNext.getData().compareTo(insertItem) < 0) {
-					currentNext.nextNode = new ListNode<T>(insertItem);
+					lastNode = currentNext.nextNode = new ListNode<T>(insertItem);
 				} else {
 					ListNode<T> first = current;
 					ListNode<T> second = current.nextNode;
@@ -157,5 +157,12 @@ public class SortedList<T extends Comparable<T>> {
 		}
 
 		System.out.println();
+	}
+
+	public void merge(SortedList<T> list2) {
+		while(!list2.isEmpty()){
+			this.insert(list2.removeFromFront());
+		}
+		
 	}
 }

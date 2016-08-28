@@ -1,5 +1,5 @@
 // Grzegorz Koñczak, 27.08.2016
-// Exercise number 21.6 page 946
+// Exercise number 21.6/9 page 946
 // Exercise from Java:How to program 10th edition
 
 package com.deitel.datastructures;
@@ -54,8 +54,6 @@ public class List<T> {
 		name = listName;
 		firstNode = lastNode = null;
 	}
-	
-	
 
 	ListNode<T> getFirstNode() {
 		return firstNode;
@@ -160,5 +158,13 @@ public class List<T> {
 		}
 
 		System.out.println();
+	}
+
+	public static <T> List<T> reverseCopy(List<T> list1) {
+		List<T> reversed = new List<>();
+		while (!list1.isEmpty()) {
+			reversed.insertAtFront(list1.removeFromFront());
+		}
+		return reversed;
 	}
 } // end class List<T>
