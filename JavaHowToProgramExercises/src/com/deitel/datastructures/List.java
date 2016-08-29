@@ -1,5 +1,5 @@
 // Grzegorz Koñczak, 27.08.2016
-// Exercise number 21.6/9 page 946
+// Exercise number 21.6/9/20/21 page 946/948
 // Exercise from Java:How to program 10th edition
 
 package com.deitel.datastructures;
@@ -110,11 +110,11 @@ public class List<T> {
 
 		return removedItem; // return removed node data
 	} // end method removeFromFront
-	
-	public int size(){
+
+	public int size() {
 		ListNode<T> current = firstNode;
 		int count = 0;
-		while (!isEmpty() && current != null){
+		while (!isEmpty() && current != null) {
 			current = current.nextNode;
 			count++;
 		}
@@ -170,11 +170,39 @@ public class List<T> {
 		System.out.println();
 	}
 
+	public void printListBackwards() {
+		printNode(firstNode);
+	}
+
+	private void printNode(ListNode<T> node) {
+		if (node == lastNode) {
+			System.out.printf("The %s backward is: %s ", name, node.data);
+		} else {
+			printNode(node.nextNode);
+			System.out.printf("%s ", node.data);
+		}
+
+	}
+
 	public static <T> List<T> reverseCopy(List<T> list1) {
 		List<T> reversed = new List<>();
 		while (!list1.isEmpty()) {
 			reversed.insertAtFront(list1.removeFromFront());
 		}
 		return reversed;
+	}
+
+	public T search(T data) {
+		return searchNodes(data, firstNode);
+	}
+
+	private T searchNodes(T data, ListNode<T> node) {
+		if (node.data == data) {
+			return data;
+		} else if (node != lastNode) {
+			return searchNodes(data, node.nextNode);
+		} else {
+			return null;
+		}
 	}
 } // end class List<T>

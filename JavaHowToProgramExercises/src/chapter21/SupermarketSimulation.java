@@ -2,8 +2,6 @@
 // Exercise number 21.15 page 948
 // Exercise from Java:How to program 10th edition
 
-// Something wrong in second part - to evenly distributed...
-
 package chapter21;
 
 import java.security.SecureRandom;
@@ -13,8 +11,8 @@ import com.deitel.datastructures.Queue;
 public class SupermarketSimulation {
 
 	private static final SecureRandom randomNumbers = new SecureRandom();
-	private final static int ARRIVAL_TIME = 1;
-	private final static int SERVICE_TIME = 4;
+	private final static int ARRIVAL_TIME = 2;
+	private final static int SERVICE_TIME = 2;
 
 	public static void main(String[] args) {
 
@@ -27,7 +25,6 @@ public class SupermarketSimulation {
 		int longestLine = 0;
 		int difference = 0;
 		int largestDifference = 0;
-		int deadTime = 0;
 
 		// Simulation of 720 minutes of supermarket line processing
 		for (int i = 1; i < 721; i++) {
@@ -74,7 +71,6 @@ public class SupermarketSimulation {
 					// schedule service time for that customer
 					// and schedule arrival time of next customer
 					// Start next loop iteration
-					deadTime += i - nextArrival;
 					i = nextArrival;
 					System.out.println("Customer " + customerCount + " arrives");
 					customerCount++;
@@ -85,8 +81,9 @@ public class SupermarketSimulation {
 			// without scheduling next arrival and process time in
 			// advance.
 			} else if (i > firstArrival){
+				//System.out.println("Here");
 				for (int j = 0; j < serviceTime; j++) {
-					
+					//System.out.println("for loop and i is: " + i + " and next arrival: " + nextArrival);
 					if (i == nextArrival) {
 						System.out.println("Customer " + customerCount + " arrives");
 						customerCount++;
@@ -96,16 +93,16 @@ public class SupermarketSimulation {
 					i++;
 				}
 				System.out.println("Service completed for " + serviceCount + " customer");
-				serviceCount++;				
+				serviceCount++;
 				if (!line.isEmpty()) {
 					difference = i - line.dequeue();
 					if (largestDifference < difference){
 						largestDifference = difference;
 					}
 					serviceTime = 1 + randomNumbers.nextInt(SERVICE_TIME);
+					i--;
 				} else {
-					deadTime += i - nextArrival;
-					i = nextArrival - 1;
+					i = nextArrival;
 					System.out.println("Customer " + customerCount + " arrives");
 					customerCount++;
 					serviceTime = 1 + randomNumbers.nextInt(SERVICE_TIME);
@@ -115,6 +112,5 @@ public class SupermarketSimulation {
 		}
 		System.out.println("Longest line: " + longestLine);
 		System.out.println("Longest wait time in minutes: " + largestDifference);
-		System.out.println("Time when there where no clients: " + (720 - deadTime));
 	}
 }
