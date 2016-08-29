@@ -31,13 +31,10 @@ private static final Scanner input = new Scanner(System.in);
 		for (int i = 0; i < charArray.length; i++) {
 			if (Character.isLetter(charArray[i])){
 				characterStack.push(charArray[i]);
+				characterStackReverse.push(charArray[charArray.length - 1 - i]);
 			}
 		}
-		for (int i = charArray.length - 1; i >= 0; i--) {
-			if (Character.isLetter(charArray[i])){
-				characterStackReverse.push(charArray[i]);
-			}
-		}
+		
 		while (!characterStack.isEmpty()){
 			if (characterStack.pop() != characterStackReverse.pop()){
 				return false;

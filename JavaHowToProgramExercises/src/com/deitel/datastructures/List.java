@@ -110,6 +110,16 @@ public class List<T> {
 
 		return removedItem; // return removed node data
 	} // end method removeFromFront
+	
+	public int size(){
+		ListNode<T> current = firstNode;
+		int count = 0;
+		while (!isEmpty() && current != null){
+			current = current.nextNode;
+			count++;
+		}
+		return count;
+	}
 
 	// remove last node from List
 	public T removeFromBack() throws EmptyListException {

@@ -25,6 +25,13 @@ public class Stack<T>
    { 
       return stackList.removeFromFront(); 
    } 
+   
+   // return object from stack without popping it
+   public T peek() throws EmptyListException {
+	   T element = pop();
+	   push(element);
+	   return element;
+   }
 
    // determine if stack is empty
    public boolean isEmpty() 
