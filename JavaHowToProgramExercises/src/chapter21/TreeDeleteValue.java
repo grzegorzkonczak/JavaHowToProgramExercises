@@ -12,40 +12,34 @@ import com.deitel.datastructures.Tree;
 public class TreeDeleteValue {
 
 	private static final Scanner input = new Scanner(System.in);
-	
+
 	public static void main(String[] args) {
-		Tree<Integer> tree = new Tree<Integer>();
 		SecureRandom randomNumber = new SecureRandom();
 
+		Tree<Integer> tree = new Tree<Integer>();
 		System.out.println("Inserting the following values: ");
-
-		Integer[] intArray = {91, 16, 32, 20, 39, 52, 31, 41, 12, 14, 30};
-		// insert 10 random integers from 0-99 in tree
+		Integer[] intArray = new Integer[20];
+		// insert 20 random integers from 0-99 in tree
 		for (int i = 0; i < intArray.length; i++) {
+			intArray[i] = 1 + randomNumber.nextInt(100);
 			tree.insertNode(intArray[i]);
 			System.out.print(intArray[i] + " ");
 		}
-
-		System.out.printf("%n%nPreorder traversal%n");
-		tree.preorderTraversal();
-
 		System.out.printf("%n%nInorder traversal%n");
 		tree.inorderTraversal();
-
-		System.out.printf("%n%nPostorder traversal%n");
-		tree.postorderTraversal();
 		System.out.println();
-		
-		for (int i = 0; i < 4; i++) {
-			System.out.println("Enter value to delete:");
-			int toDelete = input.nextInt();
+		System.out.println();
+		for (int i = 0; i < intArray.length; i++) {
+			int toDelete = intArray[randomNumber.nextInt(intArray.length)];
+			while (tree.contains(toDelete) == null) {
+				toDelete = intArray[randomNumber.nextInt(intArray.length)];
+			}
+			System.out.println("Deleting: " + toDelete);
 			tree.deleteNode(toDelete);
-			System.out.printf("%n%nPreorder traversal%n");
-			tree.preorderTraversal();
+
 			System.out.printf("%n%nInorder traversal%n");
 			tree.inorderTraversal();
-			System.out.printf("%n%nPostorder traversal%n");
-			tree.postorderTraversal();
+
 			System.out.println();
 		}
 

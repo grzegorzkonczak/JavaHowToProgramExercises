@@ -1,5 +1,5 @@
 // Grzegorz Koñczak, 29.08.2016
-// Exercise number 21.16 page 948
+// Exercise number 21.16/24 page 948/950
 // Exercise from Java:How to program 10th edition
 
 package chapter21;
@@ -30,6 +30,9 @@ public class TreeTest
 
 		System.out.printf("%n%nPostorder traversal%n");
 		tree.postorderTraversal();
+		
+		System.out.printf("%n%nLevel-order traversal%n");
+		tree.levelOrder();
 		System.out.println();
 	}
 } // end class TreeTest

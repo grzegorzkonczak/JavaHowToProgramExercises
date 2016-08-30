@@ -1,8 +1,12 @@
 // Grzegorz Koñczak, 29.08.2016
-// Exercise number 21.16/17/19/22/23 page 948
+// Exercise number 21.16/17/19/22/23/24 page 948
 // Exercise from Java:How to program 10th edition
 
 package com.deitel.datastructures;
+
+// method deleteNode is horrible... that is not close to how i like to write code
+// just bad day fighting with this implementation.
+// TODO: refactor deleteNode()
 
 // class TreeNode definition
 class TreeNode<T extends Comparable<T>> {
@@ -11,12 +15,38 @@ class TreeNode<T extends Comparable<T>> {
 	T data; // node value
 	TreeNode<T> rightNode;
 	TreeNode<T> parentNode;
+	
+	
+
+	public TreeNode<T> getLeftNode() {
+		return leftNode;
+	}
+
+	public void setLeftNode(TreeNode<T> leftNode) {
+		this.leftNode = leftNode;
+	}
+
+	public TreeNode<T> getRightNode() {
+		return rightNode;
+	}
+
+	public void setRightNode(TreeNode<T> rightNode) {
+		this.rightNode = rightNode;
+	}
+
+	public TreeNode<T> getParentNode() {
+		return parentNode;
+	}
+
+	public void setParentNode(TreeNode<T> parentNode) {
+		this.parentNode = parentNode;
+	}
 
 	// constructor initializes data and makes this a leaf node
 	public TreeNode(T nodeData, TreeNode<T> parentNode) {
 		data = nodeData;
-		leftNode = rightNode =  null; // node has no children
-		this.parentNode = parentNode; 
+		leftNode = rightNode = null; // node has no children
+		this.parentNode = parentNode;
 	}
 
 	// locate insertion point and insert new node; ignore duplicate values
@@ -45,6 +75,14 @@ class TreeNode<T extends Comparable<T>> {
 		}
 		return 0;
 	}
+
+	@Override
+	public String toString() {
+		return "TreeNode [leftNode=" + (leftNode == null ? null : leftNode.data) + ", data=" + data + ", rightNode="
+				+ (rightNode == null ? null : rightNode.data) + ", parentNode="
+				+ (parentNode == null ? null : parentNode.data) + "]";
+	}
+
 } // end class TreeNode
 
 // class Tree definition
@@ -113,49 +151,165 @@ public class Tree<T extends Comparable<T>> {
 		postorderHelper(node.rightNode); // traverse right subtree
 		System.out.printf("%s ", node.data); // output node data
 	}
+	
+	public void levelOrder(){
+		Queue<TreeNode<T>> queue = new Queue<>();
+		queue.enqueue(root);
+		while (!queue.isEmpty()){
+			TreeNode<T> print = queue.dequeue();
+			System.out.printf("%s ", print.data);
+			if (print.leftNode != null){
+				queue.enqueue(print.leftNode);
+			}
+			if (print.rightNode != null){
+				queue.enqueue(print.rightNode);
+			}
+		}
+	}
 
 	public int getDepth() {
 		return depth;
 	}
+	
+	public T contains(T element){
+		TreeNode<T> temp = locateNode(element, root);
+		return temp == null ? null : temp.data;
+	}
 
 	public void deleteNode(T element) {
-		TreeNode<T> node = locateNode(element, root);
+		TreeNode<T> nodeToDelete = locateNode(element, root);
 		// When element was not found
-		if (node == null) {
+		if (nodeToDelete == null) {
 			System.out.println("No such element.");
-		// When element is leaf
-		} else if (node.leftNode == null && node.rightNode == null) {
-			if (node.parentNode.leftNode == node){
-				node.parentNode.leftNode = null;
-			} else {
-				node.parentNode.rightNode = null;
-			}
-		// When element has one child
-		} else if (node.leftNode == null || node.rightNode == null){
-			if (node.leftNode == null){
-				if (node.parentNode.rightNode == node) {
-					node.parentNode.rightNode = node.rightNode;
-					node.rightNode.parentNode = node.parentNode;
-					node = null;
+			// When element is leaf
+		} else if (nodeToDelete == root) {
+			if (nodeToDelete.getLeftNode() == null && nodeToDelete.getRightNode() == null) {
+				root = null;
+			} else if (nodeToDelete.getLeftNode() == null || nodeToDelete.getRightNode() == null) {
+				if (nodeToDelete.getLeftNode() == null) {
+					root = nodeToDelete.getRightNode();
+					nodeToDelete.getRightNode().setParentNode(null);
+					nodeToDelete = null;
 				} else {
-					node.parentNode.leftNode = node.rightNode;
-					node.rightNode.parentNode = node.parentNode;
-					node = null;
+					root = nodeToDelete.getLeftNode();
+					nodeToDelete.getLeftNode().setParentNode(null);
+					nodeToDelete = null;
 				}
 			} else {
-				if (node.parentNode.leftNode == node) {
-					node.parentNode.leftNode = node.leftNode;
-					node.leftNode.parentNode = node.parentNode;
-					node = null;
+				TreeNode<T> replacementNode = nodeToDelete.getLeftNode();
+				while (replacementNode.getRightNode() != null) {
+					replacementNode = replacementNode.getRightNode();
+				}
+				if (replacementNode.getLeftNode() == null) {
+					root = replacementNode;
+					if (replacementNode.getParentNode().getRightNode() == replacementNode) {
+						replacementNode.getParentNode().setRightNode(null);
+					} else {
+						replacementNode.getParentNode().setLeftNode(null);
+					}
+					replacementNode.setRightNode(nodeToDelete.getRightNode());
+					replacementNode.setLeftNode(nodeToDelete.getLeftNode());
+					replacementNode.setParentNode(null);
+					if (replacementNode.getLeftNode() != null) {
+						replacementNode.getLeftNode().setParentNode(replacementNode);
+					}
+					if (replacementNode.getRightNode() != null){
+						replacementNode.getRightNode().setParentNode(replacementNode);
+					}
 				} else {
-					node.parentNode.rightNode = node.leftNode;
-					node.leftNode.parentNode = node.parentNode;
-					node = null;
+					root = replacementNode;
+					replacementNode.getParentNode().setRightNode(replacementNode.getLeftNode());
+					replacementNode.getLeftNode().setParentNode(replacementNode.getParentNode());
+					replacementNode.setRightNode(nodeToDelete.getRightNode());
+					replacementNode.setLeftNode(nodeToDelete.getLeftNode());
+					replacementNode.setParentNode(null);
+					if (replacementNode.getLeftNode() != null) {
+						replacementNode.getLeftNode().setParentNode(replacementNode);
+					} 
+					if (replacementNode.getRightNode() != null){
+						replacementNode.getRightNode().setParentNode(replacementNode);
+					}
 				}
 			}
-		// TODO When element has 2 children
+
+		} else if (nodeToDelete.getLeftNode() == null && nodeToDelete.getRightNode() == null) {
+			if (nodeToDelete.getParentNode().getLeftNode() == nodeToDelete) {
+				nodeToDelete.getParentNode().setLeftNode(null);
+			} else {
+				nodeToDelete.getParentNode().setRightNode(null);
+			}
+
+			// When element has one child
+		} else if (nodeToDelete.leftNode == null || nodeToDelete.rightNode == null) {
+			if (nodeToDelete.leftNode == null) {
+				if (nodeToDelete.parentNode.rightNode == nodeToDelete) {
+					nodeToDelete.parentNode.rightNode = nodeToDelete.rightNode;
+					nodeToDelete.rightNode.parentNode = nodeToDelete.parentNode;
+					nodeToDelete = null;
+				} else {
+					nodeToDelete.parentNode.leftNode = nodeToDelete.rightNode;
+					nodeToDelete.rightNode.parentNode = nodeToDelete.parentNode;
+					nodeToDelete = null;
+				}
+			} else {
+				if (nodeToDelete.parentNode.leftNode == nodeToDelete) {
+					nodeToDelete.parentNode.leftNode = nodeToDelete.leftNode;
+					nodeToDelete.leftNode.parentNode = nodeToDelete.parentNode;
+					nodeToDelete = null;
+				} else {
+					nodeToDelete.parentNode.rightNode = nodeToDelete.leftNode;
+					nodeToDelete.leftNode.parentNode = nodeToDelete.parentNode;
+					nodeToDelete = null;
+				}
+			}
+			// When element has 2 children
 		} else {
-			
+			TreeNode<T> replacementNode = nodeToDelete.getLeftNode();
+			while (replacementNode.getRightNode() != null) {
+				replacementNode = replacementNode.getRightNode();
+			}
+			if (replacementNode.getLeftNode() == null) {
+				TreeNode<T> temp = nodeToDelete.getLeftNode();
+				boolean proximityCheck = temp != replacementNode;
+				if (nodeToDelete.getParentNode().getRightNode() == nodeToDelete) {
+					nodeToDelete.getParentNode().setRightNode(replacementNode);
+				} else {
+					nodeToDelete.getParentNode().setLeftNode(replacementNode);
+				}
+				if (replacementNode.getParentNode().getRightNode() == replacementNode) {
+					replacementNode.getParentNode().setRightNode(null);
+				} else {
+					replacementNode.getParentNode().setLeftNode(null);
+				}
+				replacementNode.setRightNode(nodeToDelete.getRightNode());
+				if (proximityCheck){
+					temp.setRightNode(null);
+					replacementNode.setLeftNode(temp);
+				}
+				replacementNode.setParentNode(nodeToDelete.getParentNode());
+				if (replacementNode.getLeftNode() != null) {
+					replacementNode.getLeftNode().setParentNode(replacementNode);
+				} else if (replacementNode.getRightNode() != null){
+					replacementNode.getRightNode().setParentNode(replacementNode);
+				}
+			} else {
+				if (nodeToDelete.getParentNode().getRightNode() == nodeToDelete) {
+					nodeToDelete.getParentNode().setRightNode(replacementNode);
+				} else {
+					nodeToDelete.getParentNode().setLeftNode(replacementNode);
+				}
+				replacementNode.getParentNode().setRightNode(replacementNode.getLeftNode());
+				replacementNode.getLeftNode().setParentNode(replacementNode.getParentNode());
+				replacementNode.setRightNode(nodeToDelete.getRightNode());
+				replacementNode.setLeftNode(nodeToDelete.getLeftNode());
+				replacementNode.setParentNode(nodeToDelete.getParentNode());
+				if (replacementNode.getLeftNode() != null) {
+					replacementNode.getLeftNode().setParentNode(replacementNode);
+				} 
+				if (replacementNode.getRightNode() != null){
+					replacementNode.getRightNode().setParentNode(replacementNode);
+				}
+			}
 		}
 	}
 
@@ -172,8 +326,16 @@ public class Tree<T extends Comparable<T>> {
 				return rightNode;
 			} else {
 				return leftNode;
-			} 
+			}
 		}
 		return null;
+	}
+	
+	public boolean isEmpty(){
+		if (root == null){
+			return true;
+		} else {
+			return false;
+		}
 	}
 } // end class Tree
