@@ -1,5 +1,5 @@
 // Grzegorz Koñczak, 29.08.2016
-// Exercise number 21.16/17/19/22/23/24 page 948
+// Exercise number 21.16/17/19/22/23/24/25 page 948
 // Exercise from Java:How to program 10th edition
 
 package com.deitel.datastructures;
@@ -15,8 +15,6 @@ class TreeNode<T extends Comparable<T>> {
 	T data; // node value
 	TreeNode<T> rightNode;
 	TreeNode<T> parentNode;
-	
-	
 
 	public TreeNode<T> getLeftNode() {
 		return leftNode;
@@ -151,17 +149,17 @@ public class Tree<T extends Comparable<T>> {
 		postorderHelper(node.rightNode); // traverse right subtree
 		System.out.printf("%s ", node.data); // output node data
 	}
-	
-	public void levelOrder(){
+
+	public void levelOrder() {
 		Queue<TreeNode<T>> queue = new Queue<>();
 		queue.enqueue(root);
-		while (!queue.isEmpty()){
+		while (!queue.isEmpty()) {
 			TreeNode<T> print = queue.dequeue();
 			System.out.printf("%s ", print.data);
-			if (print.leftNode != null){
+			if (print.leftNode != null) {
 				queue.enqueue(print.leftNode);
 			}
-			if (print.rightNode != null){
+			if (print.rightNode != null) {
 				queue.enqueue(print.rightNode);
 			}
 		}
@@ -170,8 +168,8 @@ public class Tree<T extends Comparable<T>> {
 	public int getDepth() {
 		return depth;
 	}
-	
-	public T contains(T element){
+
+	public T contains(T element) {
 		TreeNode<T> temp = locateNode(element, root);
 		return temp == null ? null : temp.data;
 	}
@@ -213,7 +211,7 @@ public class Tree<T extends Comparable<T>> {
 					if (replacementNode.getLeftNode() != null) {
 						replacementNode.getLeftNode().setParentNode(replacementNode);
 					}
-					if (replacementNode.getRightNode() != null){
+					if (replacementNode.getRightNode() != null) {
 						replacementNode.getRightNode().setParentNode(replacementNode);
 					}
 				} else {
@@ -225,8 +223,8 @@ public class Tree<T extends Comparable<T>> {
 					replacementNode.setParentNode(null);
 					if (replacementNode.getLeftNode() != null) {
 						replacementNode.getLeftNode().setParentNode(replacementNode);
-					} 
-					if (replacementNode.getRightNode() != null){
+					}
+					if (replacementNode.getRightNode() != null) {
 						replacementNode.getRightNode().setParentNode(replacementNode);
 					}
 				}
@@ -282,14 +280,14 @@ public class Tree<T extends Comparable<T>> {
 					replacementNode.getParentNode().setLeftNode(null);
 				}
 				replacementNode.setRightNode(nodeToDelete.getRightNode());
-				if (proximityCheck){
+				if (proximityCheck) {
 					temp.setRightNode(null);
 					replacementNode.setLeftNode(temp);
 				}
 				replacementNode.setParentNode(nodeToDelete.getParentNode());
 				if (replacementNode.getLeftNode() != null) {
 					replacementNode.getLeftNode().setParentNode(replacementNode);
-				} else if (replacementNode.getRightNode() != null){
+				} else if (replacementNode.getRightNode() != null) {
 					replacementNode.getRightNode().setParentNode(replacementNode);
 				}
 			} else {
@@ -305,8 +303,8 @@ public class Tree<T extends Comparable<T>> {
 				replacementNode.setParentNode(nodeToDelete.getParentNode());
 				if (replacementNode.getLeftNode() != null) {
 					replacementNode.getLeftNode().setParentNode(replacementNode);
-				} 
-				if (replacementNode.getRightNode() != null){
+				}
+				if (replacementNode.getRightNode() != null) {
 					replacementNode.getRightNode().setParentNode(replacementNode);
 				}
 			}
@@ -330,12 +328,29 @@ public class Tree<T extends Comparable<T>> {
 		}
 		return null;
 	}
-	
-	public boolean isEmpty(){
-		if (root == null){
+
+	public boolean isEmpty() {
+		if (root == null) {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	public void outputTree(int totalSpaces) {
+		outputHelper(totalSpaces, root);
+	}
+
+	private void outputHelper(int totalSpaces, TreeNode<T> node) {
+		while (node != null) {
+			outputHelper(totalSpaces + 5, node.rightNode);
+			for (int i = 1; i <= totalSpaces; i++) {
+				System.out.print(" ");
+			}
+			System.out.print(node.data);
+			node = node.leftNode;
+			totalSpaces += 5;
+			System.out.println();
 		}
 	}
 } // end class Tree

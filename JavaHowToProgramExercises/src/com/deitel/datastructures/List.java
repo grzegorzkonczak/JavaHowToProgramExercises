@@ -1,5 +1,5 @@
-// Grzegorz Koñczak, 27.08.2016
-// Exercise number 21.6/9/20/21 page 946/948
+// Grzegorz Koñczak, 27//28/30.08.2016
+// Exercise number 21.6/9/20/21/26 page 946/948/950
 // Exercise from Java:How to program 10th edition
 
 package com.deitel.datastructures;
@@ -77,6 +77,51 @@ public class List<T> {
 
 	void setName(String name) {
 		this.name = name;
+	}
+
+	public void insert(int index, T data) {
+		if (isEmpty()) {
+			throw new EmptyListException();
+		} else {
+			if (index != 0) {
+				ListNode<T> node = firstNode;
+				for (int i = 0; i < index - 1; i++) {
+					if (node == null) {
+						System.err.println("Out of list!");
+						return;
+					} else {
+						node = node.nextNode;
+					}
+				}
+				node.nextNode = new ListNode<T>(data, node.nextNode);
+			} else {
+				firstNode = new ListNode<T>(data, firstNode);
+			}
+		}
+	}
+
+	public void delete(T data) {
+		if (firstNode.data == data){
+			firstNode = firstNode.nextNode;
+		} else {
+			ListNode<T> node = searchNodeToDelete(data, firstNode);
+			if (node != null){
+				System.out.println(node.data);
+				node.nextNode = node.nextNode.nextNode;
+			} else {
+				System.err.println("Value not found!");
+			}
+		}
+	}
+
+	private ListNode<T> searchNodeToDelete(T data, ListNode<T> node) {
+		if (node.nextNode.data == data) {
+			return node;
+		} else if (node.nextNode != lastNode) {
+			return searchNodeToDelete(data, node.nextNode);
+		} else {
+			return null;
+		}
 	}
 
 	// insert item at front of List
@@ -193,12 +238,13 @@ public class List<T> {
 	}
 
 	public T search(T data) {
-		return searchNodes(data, firstNode);
+		ListNode<T> node = searchNodes(data, firstNode);
+		return node == null ? null : node.data;
 	}
 
-	private T searchNodes(T data, ListNode<T> node) {
+	private ListNode<T> searchNodes(T data, ListNode<T> node) {
 		if (node.data == data) {
-			return data;
+			return node;
 		} else if (node != lastNode) {
 			return searchNodes(data, node.nextNode);
 		} else {
