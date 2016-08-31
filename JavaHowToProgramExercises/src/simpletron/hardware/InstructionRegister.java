@@ -2,7 +2,7 @@
 // Special section - building compiler
 // Exercise from Java:How to program 10th edition
 
-package simpletron;
+package simpletron.hardware;
 
 public class InstructionRegister {
 
@@ -23,4 +23,9 @@ public class InstructionRegister {
 	public Integer getOperand(){
 		return instruction % 100;
 	}
+
+	public Integer getInstruction() {
+		return instruction;
+	}
+
 }

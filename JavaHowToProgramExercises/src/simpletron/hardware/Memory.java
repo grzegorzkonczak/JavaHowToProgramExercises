@@ -2,12 +2,12 @@
 // Special section - building compiler
 // Exercise from Java:How to program 10th edition
 
-package simpletron;
+package simpletron.hardware;
 
 public class Memory {
 
 	private final Integer MAX_MEMORY = 100;
-	private Integer[] values;
+	private Integer[] values = new Integer[MAX_MEMORY];
 
 	public Memory() {
 		for (int i = 0; i < MAX_MEMORY; i++) {

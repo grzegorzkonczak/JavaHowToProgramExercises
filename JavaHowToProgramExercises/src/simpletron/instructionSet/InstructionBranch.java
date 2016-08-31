@@ -2,7 +2,9 @@
 // Special section - building compiler
 // Exercise from Java:How to program 10th edition
 
-package simpletron;
+package simpletron.instructionSet;
+
+import simpletron.hardware.InstructionCounter;
 
 public class InstructionBranch extends Instruction{
 

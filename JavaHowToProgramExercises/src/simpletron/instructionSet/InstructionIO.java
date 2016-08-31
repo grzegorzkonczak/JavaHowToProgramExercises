@@ -2,7 +2,9 @@
 // Special section - building compiler
 // Exercise from Java:How to program 10th edition
 
-package simpletron;
+package simpletron.instructionSet;
+
+import simpletron.hardware.Memory;
 
 public abstract class InstructionIO extends Instruction{
 	
@@ -17,12 +19,6 @@ public abstract class InstructionIO extends Instruction{
 
 	public Memory getMemory() {
 		return memory;
-	}
-
-
-
-	public void setMemory(Memory memory) {
-		this.memory = memory;
 	}
 
 }

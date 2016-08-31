@@ -2,7 +2,10 @@
 // Special section - building compiler
 // Exercise from Java:How to program 10th edition
 
-package simpletron;
+package simpletron.instructionSet;
+
+import simpletron.hardware.Accumulator;
+import simpletron.hardware.InstructionCounter;
 
 public class InstructionBranchZero extends InstructionConditionalBranch{
 
@@ -12,7 +15,7 @@ public class InstructionBranchZero extends InstructionConditionalBranch{
 
 	@Override
 	public void executeInstruction() {
-		if (super.getAccumulatorValue() == 0){
+		if (super.loadAccumulatorValue() == 0){
 			getInstructionCounter().setCount(getOperand());
 		}
 	}
