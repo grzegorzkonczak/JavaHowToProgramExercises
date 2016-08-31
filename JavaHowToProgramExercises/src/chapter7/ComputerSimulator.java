@@ -4,11 +4,14 @@
 
 package chapter7;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class ComputerSimulator {
 
 	private static final Scanner input = new Scanner(System.in);
+	private static Scanner inInstructions;
 
 	public static void main(String[] args) {
 
@@ -18,23 +21,29 @@ public class ComputerSimulator {
 		System.out.println("*** (or data word) at a time. I will display     ***");
 		System.out.println("*** the location number and a question mark (?). ***");
 		System.out.println("*** You then type the word for that location.    ***");
-		System.out.println("*** Type -99999 to stop entering your program.   ***");
+		System.out.println("*** Type -FFFF to stop entering your program.   ***");
 		System.out.println();
 
 		// Initializing variables
 		int[] memory = new int[100];
 		int instructionCounter = 0;
-		int instruction = 0;
 		
-		// Loading program from user by entering instructions in sequence
-		System.out.printf("%02d ? ", instructionCounter);
-		instruction = input.nextInt();
-		while (instruction != -99999) {
-			memory[instructionCounter] = instruction;
-			instructionCounter++;
-			System.out.printf("%02d ? ", instructionCounter);
-			instruction = input.nextInt();
+		// Open file with code
+		try {
+			System.out.println("Input name of file with instruction:");
+			inInstructions = new Scanner(Paths.get(input.nextLine()));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
+		// Loading program from file
+		while (inInstructions.hasNext()) {
+			memory[instructionCounter] = Integer.parseInt(inInstructions.nextLine());
+			instructionCounter++;
+		}
+		
+		// Close file after loading instructions
+		inInstructions.close();
 		
 		// Information about starting the provided program
 		System.out.println();

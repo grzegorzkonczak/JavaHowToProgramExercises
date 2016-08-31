@@ -1,0 +1,19 @@
+1 rem calculate sum of even integers from 2 to 30
+2 rem initialize variables
+3 rem loop control
+4 let a = 2
+5 rem initialize sum
+6 let s = 0
+7 rem start loop
+8 if a > 30 goto 18
+9 rem condition for summing
+10 if a % 2 == 0 goto 16
+11 rem increment loop
+12 let a = a + 1
+13 rem loop end
+14 goto 8
+15 rem summing even integers
+16 let s = s + a
+17 goto 12
+18 print s
+19 end

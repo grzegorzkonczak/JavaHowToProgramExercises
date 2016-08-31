@@ -1,0 +1,19 @@
+1 rem find smallest integer
+2 rem initialize how many integers to check and start loop
+3 let a = 10
+4 rem initialize biggest value to 0
+5 let v = 1000
+6 let z = 0
+7 if a == z goto 18
+8 rem input value from user and compare with biggest value
+9 input b
+10 if b < v goto 16
+11 rem increment loop counter
+12 let z = z + 1
+13 rem go back to loop start
+14 goto 7
+15 rem assign new biggest value and go back to loop
+16 let b = v
+17 goto 12
+18 print b
+19 end

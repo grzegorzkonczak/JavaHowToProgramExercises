@@ -1,0 +1,9 @@
+1 rem average of 3 intefers
+2 input a
+3 input b
+4 input c
+5 rem calculate average and assign it to result
+6 let d = (a + b + c) / 3
+7 rem print result
+8 print d
+9 end

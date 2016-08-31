@@ -1,0 +1,12 @@
+1 rem input and calculate average of 10 integers
+2 let z = 0
+3 if z == 10 goto 10
+4 rem input integer
+5 input a
+6 let s = s + a
+7 let z = z + 1
+8 goto 3
+9 rem calculate average and print result
+10 let b = s / 10
+11 print b
+12 end
