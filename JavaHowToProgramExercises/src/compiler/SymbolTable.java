@@ -44,4 +44,14 @@ public class SymbolTable {
 		}
 		return -1;
 	}
+
+	public void print() {
+		System.out.printf("%-6s%-6s%-6s%n", "Symbol", "Type", "Location");
+		for (TableEntry tableEntry : tableEntryArray) {
+			if (tableEntry != null) {
+				System.out.printf("%-6d %-6c %-6d%n", tableEntry.getSymbol(), tableEntry.getType(),
+						tableEntry.getLocation());
+			}
+		}
+	}
 }

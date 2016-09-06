@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import javax.swing.text.StyleContext.SmallAttributeSet;
+
 import com.deitel.datastructures.Stack;
 
 import simpletron.Execute;
@@ -35,6 +37,9 @@ public class Compiler {
 		instructionCounter = 0;
 		dataCounter = 99;
 		smlArray = new Integer[100];
+		for (int i = 0; i < smlArray.length; i++) {
+			smlArray[i] = 0000;
+		}
 		flags = new Integer[100];
 		for (int i = 0; i < flags.length; i++) {
 			flags[i] = -1;
@@ -47,6 +52,7 @@ public class Compiler {
 		convertToSMLCode();
 		outputConvertedCodeToFile();
 		loadConvertedFileToSimpletron();
+		//table.print();
 	}
 
 	private void outputConvertedCodeToFile() {
@@ -56,11 +62,11 @@ public class Compiler {
 			System.err.println("Wrong output file location!");
 			e.printStackTrace();
 		}
-		
+
 		for (Integer instruction : smlArray) {
-			output.format(instruction + "%n");
+			output.format("%04d%n", instruction);
 		}
-		
+
 		output.close();
 	}
 
@@ -71,11 +77,11 @@ public class Compiler {
 
 	private void performSecondPass() {
 		for (int i = 0; i < flags.length; i++) {
-			if (flags[i] != -1){
+			if (flags[i] != -1) {
 				smlArray[i] += table.getLocation(flags[i]);
 			}
 		}
-		
+
 	}
 
 	private void performFirstPass() {
@@ -103,14 +109,14 @@ public class Compiler {
 					instructionCounter++;
 				}
 				break;
-			// TODO: finish implementing rest of if cases
 			case "if":
 				if (!table.isSymbolInTable(Integer.parseInt(tokens.get(0)))) {
 					table.insertTableEntry(Integer.parseInt(tokens.get(0)), 'L', instructionCounter);
 				}
 				if (Character.isDigit(tokens.get(2).charAt(0))) {
 					if (!table.isSymbolInTable(Integer.parseInt(tokens.get(2)))) {
-						table.insertTableEntry(Integer.parseInt(tokens.get(2)), 'C', instructionCounter);
+						table.insertTableEntry(Integer.parseInt(tokens.get(2)), 'C', dataCounter);
+						smlArray[dataCounter--] = Integer.parseInt(tokens.get(2));
 					}
 				} else {
 					if (!table.isSymbolInTable((int) (tokens.get(2).charAt(0)))) {
@@ -118,17 +124,26 @@ public class Compiler {
 					}
 				}
 				if (Character.isDigit(tokens.get(4).charAt(0))) {
-					if (!table.isSymbolInTable(Integer.parseInt(tokens.get(2)))) {
-						table.insertTableEntry(Integer.parseInt(tokens.get(2)), 'C', instructionCounter);
+					if (!table.isSymbolInTable(Integer.parseInt(tokens.get(4)))) {
+						table.insertTableEntry(Integer.parseInt(tokens.get(4)), 'C', dataCounter);
+						smlArray[dataCounter--] = Integer.parseInt(tokens.get(4));
 					}
 				} else {
 					if (!table.isSymbolInTable((int) (tokens.get(4).charAt(0)))) {
-						table.insertTableEntry((int) tokens.get(2).charAt(0), 'V', dataCounter--);
+						table.insertTableEntry((int) tokens.get(4).charAt(0), 'V', dataCounter--);
 					}
 				}
 				if (tokens.get(3).equals("==")) {
-					smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(2).charAt(0));
-					smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(4).charAt(0));
+					if (Character.isDigit(tokens.get(2).charAt(0))) {
+						smlArray[instructionCounter++] = 2000 + table.getLocation(Integer.parseInt(tokens.get(2)));
+					} else {
+						smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(2).charAt(0));
+					}
+					if (Character.isDigit(tokens.get(4).charAt(0))) {
+						smlArray[instructionCounter++] = 3100 + table.getLocation(Integer.parseInt(tokens.get(4)));
+					} else {
+						smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(4).charAt(0));
+					}
 					Integer branchLocation = table.searchSymbol(Integer.parseInt(tokens.get(6)));
 					if (branchLocation == -1) {
 						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
@@ -137,15 +152,123 @@ public class Compiler {
 						smlArray[instructionCounter++] = 4200 + branchLocation;
 					}
 				} else if (tokens.get(3).equals("<")) {
-
+					if (Character.isDigit(tokens.get(2).charAt(0))) {
+						smlArray[instructionCounter++] = 2000 + table.getLocation(Integer.parseInt(tokens.get(2)));
+					} else {
+						smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(2).charAt(0));
+					}
+					if (Character.isDigit(tokens.get(4).charAt(0))) {
+						smlArray[instructionCounter++] = 3100 + table.getLocation(Integer.parseInt(tokens.get(4)));
+					} else {
+						smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(4).charAt(0));
+					}
+					Integer branchLocation = table.searchSymbol(Integer.parseInt(tokens.get(6)));
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4100;
+					} else {
+						smlArray[instructionCounter++] = 4100 + branchLocation;
+					}
 				} else if (tokens.get(3).equals(">")) {
-
+					if (Character.isDigit(tokens.get(4).charAt(0))) {
+						smlArray[instructionCounter++] = 2000 + table.getLocation(Integer.parseInt(tokens.get(4)));
+					} else {
+						smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(4).charAt(0));
+					}
+					if (Character.isDigit(tokens.get(2).charAt(0))) {
+						smlArray[instructionCounter++] = 3100 + table.getLocation(Integer.parseInt(tokens.get(2)));
+					} else {
+						smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(2).charAt(0));
+					}
+					Integer branchLocation = table.searchSymbol(Integer.parseInt(tokens.get(6)));
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4100;
+					} else {
+						smlArray[instructionCounter++] = 4100 + branchLocation;
+					}
 				} else if (tokens.get(3).equals("<=")) {
-
+					if (Character.isDigit(tokens.get(2).charAt(0))) {
+						smlArray[instructionCounter++] = 2000 + table.getLocation(Integer.parseInt(tokens.get(2)));
+					} else {
+						smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(2).charAt(0));
+					}
+					if (Character.isDigit(tokens.get(4).charAt(0))) {
+						smlArray[instructionCounter++] = 3100 + table.getLocation(Integer.parseInt(tokens.get(4)));
+					} else {
+						smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(4).charAt(0));
+					}
+					Integer branchLocation = table.searchSymbol(Integer.parseInt(tokens.get(6)));
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4100;
+					} else {
+						smlArray[instructionCounter++] = 4100 + branchLocation;
+					}
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4200;
+					} else {
+						smlArray[instructionCounter++] = 4200 + branchLocation;
+					}
 				} else if (tokens.get(3).equals(">=")) {
-
+					if (Character.isDigit(tokens.get(4).charAt(0))) {
+						smlArray[instructionCounter++] = 2000 + table.getLocation(Integer.parseInt(tokens.get(4)));
+					} else {
+						smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(4).charAt(0));
+					}
+					if (Character.isDigit(tokens.get(2).charAt(0))) {
+						smlArray[instructionCounter++] = 3100 + table.getLocation(Integer.parseInt(tokens.get(2)));
+					} else {
+						smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(2).charAt(0));
+					}
+					Integer branchLocation = table.searchSymbol(Integer.parseInt(tokens.get(6)));
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4100;
+					} else {
+						smlArray[instructionCounter++] = 4100 + branchLocation;
+					}
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4200;
+					} else {
+						smlArray[instructionCounter++] = 4200 + branchLocation;
+					}
 				} else if (tokens.get(3).equals("!=")) {
-
+					if (Character.isDigit(tokens.get(2).charAt(0))) {
+						smlArray[instructionCounter++] = 2000 + table.getLocation(Integer.parseInt(tokens.get(2)));
+					} else {
+						smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(2).charAt(0));
+					}
+					if (Character.isDigit(tokens.get(4).charAt(0))) {
+						smlArray[instructionCounter++] = 3100 + table.getLocation(Integer.parseInt(tokens.get(4)));
+					} else {
+						smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(4).charAt(0));
+					}
+					Integer branchLocation = table.searchSymbol(Integer.parseInt(tokens.get(6)));
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4100;
+					} else {
+						smlArray[instructionCounter++] = 4100 + branchLocation;
+					}
+					if (Character.isDigit(tokens.get(2).charAt(0))) {
+						smlArray[instructionCounter++] = 2000 + table.getLocation(Integer.parseInt(tokens.get(2)));
+					} else {
+						smlArray[instructionCounter++] = 2000 + table.getLocation((int) tokens.get(2).charAt(0));
+					}
+					if (Character.isDigit(tokens.get(4).charAt(0))) {
+						smlArray[instructionCounter++] = 3100 + table.getLocation(Integer.parseInt(tokens.get(4)));
+					} else {
+						smlArray[instructionCounter++] = 3100 + table.getLocation((int) tokens.get(4).charAt(0));
+					}
+					if (branchLocation == -1) {
+						flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+						smlArray[instructionCounter++] = 4100;
+					} else {
+						smlArray[instructionCounter++] = 4100 + branchLocation;
+					}
 				}
 				break;
 			case "let":
@@ -155,9 +278,10 @@ public class Compiler {
 				for (int i = 2; i < tokens.size(); i++) {
 					if (Character.isDigit(tokens.get(i).charAt(0))) {
 						if (!table.isSymbolInTable(Integer.parseInt(tokens.get(i)))) {
-							table.insertTableEntry(Integer.parseInt(tokens.get(i)), 'C', dataCounter--);
+							table.insertTableEntry(Integer.parseInt(tokens.get(i)), 'C', dataCounter);
+							smlArray[dataCounter--] = Integer.parseInt(tokens.get(i));
 						}
-					} else {
+					} else if (Character.isLetter(tokens.get(i).charAt(0))) {
 						if (!table.isSymbolInTable((int) (tokens.get(i).charAt(0)))) {
 							table.insertTableEntry((int) tokens.get(i).charAt(0), 'V', dataCounter--);
 						}
@@ -168,7 +292,7 @@ public class Compiler {
 					buffer.append(tokens.get(i) + " ");
 				}
 				String postfix = InfixToPostfixConverter.convert(buffer.toString());
-				evaluatePostfixExpressionToInstructions(postfix, (int)(tokens.get(2).charAt(0)));
+				evaluatePostfixExpressionToInstructions(postfix, (int) (tokens.get(2).charAt(0)));
 				break;
 			case "goto":
 				if (!table.isSymbolInTable(Integer.parseInt(tokens.get(0)))) {
@@ -176,21 +300,25 @@ public class Compiler {
 				}
 				Integer branchLocation = table.searchSymbol(Integer.parseInt(tokens.get(2)));
 				if (branchLocation == -1) {
-					flags[instructionCounter] = Integer.parseInt(tokens.get(6));
+					System.out.println(tokens.size());
+					flags[instructionCounter] = Integer.parseInt(tokens.get(2));
 					smlArray[instructionCounter++] = 4000;
 				} else {
-					smlArray[instructionCounter++] = 4200 + branchLocation;
+					smlArray[instructionCounter++] = 4000 + branchLocation;
 				}
+				break;
 			case "print":
 				if (!table.isSymbolInTable(Integer.parseInt(tokens.get(0)))) {
 					table.insertTableEntry(Integer.parseInt(tokens.get(0)), 'L', instructionCounter);
 				}
 				smlArray[instructionCounter++] = 1100 + table.getLocation((int) tokens.get(2).charAt(0));
+				break;
 			case "end":
 				if (!table.isSymbolInTable(Integer.parseInt(tokens.get(0)))) {
 					table.insertTableEntry(Integer.parseInt(tokens.get(0)), 'L', instructionCounter);
 				}
 				smlArray[instructionCounter++] = 4300;
+				break;
 			default:
 
 			}
@@ -234,20 +362,27 @@ public class Compiler {
 	// TODO: finish implementing rest of operations
 	private int generateInstruction(int argument1, int argument2, char operator) {
 		if (operator == '+') {
-			smlArray[instructionCounter++] = 2000 + argument1;
-			smlArray[instructionCounter++] = 3000 + argument2;
+			smlArray[instructionCounter++] = 2000 + argument2;
+			smlArray[instructionCounter++] = 3000 + argument1;
 			smlArray[instructionCounter++] = 2100 + dataCounter;
 			return dataCounter--;
 		} else if (operator == '-') {
-			return argument2 - argument1;
+			smlArray[instructionCounter++] = 2000 + argument2;
+			smlArray[instructionCounter++] = 3100 + argument1;
+			smlArray[instructionCounter++] = 2100 + dataCounter;
+			return dataCounter--;
 		} else if (operator == '*') {
-			return argument1 * argument2;
+			smlArray[instructionCounter++] = 2000 + argument2;
+			smlArray[instructionCounter++] = 3300 + argument1;
+			smlArray[instructionCounter++] = 2100 + dataCounter;
+			return dataCounter--;
 		} else if (operator == '/') {
-			return argument2 / argument1;
-		} else if (operator == '%') {
-			return argument1 % argument2;
+			smlArray[instructionCounter++] = 2000 + argument2;
+			smlArray[instructionCounter++] = 3200 + argument1;
+			smlArray[instructionCounter++] = 2100 + dataCounter;
+			return dataCounter--;
 		} else {
-			return (int) Math.pow(argument1, argument2);
+			return 0;
 		}
 	}
 
