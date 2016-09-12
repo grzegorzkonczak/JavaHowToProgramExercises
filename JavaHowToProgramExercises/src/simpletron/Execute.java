@@ -31,7 +31,6 @@ import simpletron.instructionSet.InstructionWrite;
 
 public class Execute {
 
-	private final static Scanner input = new Scanner(System.in);
 
 	private Memory memory;
 	private Accumulator accumulator;
@@ -48,11 +47,11 @@ public class Execute {
 		instructionRegister = new InstructionRegister();
 	}
 
-	public void run() {
+	public void run(String inputProgram) {
 		openOutputFile();
 		populateInstructionMap();
 		outputWelcomeMessage();
-		loadInstructionsToMemory();
+		loadInstructionsToMemory(inputProgram);
 		outputLoadingFinishedIndicator();
 		executeInstructionsFromMemory();
 		outputDump();
@@ -143,11 +142,10 @@ public class Execute {
 		}
 	}
 
-	private void loadInstructionsToMemory() {
+	private void loadInstructionsToMemory(String filePath) {
 		// Open file with code
 		try {
-			System.out.println("Input name of file with instruction:");
-			inInstructions = new Scanner(Paths.get(input.nextLine()));
+			inInstructions = new Scanner(Paths.get(filePath));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

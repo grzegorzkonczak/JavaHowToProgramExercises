@@ -5,15 +5,16 @@
 5 rem initialize sum
 6 let s = 0
 7 rem start loop
-8 if a > 30 goto 18
+8 if a > 30 goto 19
 9 rem condition for summing
-10 if a % 2 == 0 goto 16
-11 rem increment loop
-12 let a = a + 1
-13 rem loop end
-14 goto 8
-15 rem summing even integers
-16 let s = s + a
-17 goto 12
-18 print s
-19 end
+10 let b = a % 2
+11 if b == 0 goto 17
+12 rem increment loop
+13 let a = a + 1
+14 rem loop end
+15 goto 8
+16 rem summing even integers
+17 let s = s + a
+18 goto 13
+19 print s
+20 end

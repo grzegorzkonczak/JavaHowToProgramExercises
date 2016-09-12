@@ -30,6 +30,7 @@ public class InstructionBranch extends Instruction{
 	@Override
 	public void executeInstruction() {
 		instructionCounter.setCount(getOperand());
+		//System.out.println(getOperand());
 	}
 
 
