@@ -5,12 +5,15 @@
 package chapter24;
 
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
 
 // ResultSet rows and columns are counted from 1 and JTable 
@@ -25,6 +28,7 @@ public class ResultSetTableModel extends AbstractTableModel {
 	private ResultSet resultSet;
 	private ResultSetMetaData metaData;
 	private int numberOfRows;
+	private List<ArrayList<Object>> results;
 
 	// Creating prepared queries and adding them to array for use in JComboBox
 	private PreparedStatement selectAllAuthors;
@@ -145,8 +149,11 @@ public class ResultSetTableModel extends AbstractTableModel {
 
 		// obtain a value at specified ResultSet row and column
 		try {
-			resultSet.absolute(row + 1);
-			return resultSet.getObject(column + 1);
+			if (resultSet.absolute(row + 1)) {
+				return resultSet.getObject(column + 1);
+			} else {
+				return results.get(row).get(column);
+			}
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
 		}
@@ -159,7 +166,7 @@ public class ResultSetTableModel extends AbstractTableModel {
 		// ensure database connection is available
 		if (!connectedToDatabase)
 			throw new IllegalStateException("Not Connected to Database");
-		
+
 		// specify query and execute it
 		resultSet = statement.executeQuery(query);
 
@@ -176,10 +183,13 @@ public class ResultSetTableModel extends AbstractTableModel {
 
 	// set new database query with prepared statement
 	public void setQuery(Integer choice, String variable) throws SQLException, IllegalStateException {
+		// initialize new Array List for storing results
+		results = new ArrayList<>();
+		
 		// ensure database connection is available
 		if (!connectedToDatabase)
 			throw new IllegalStateException("Not Connected to Database");
-		
+
 		// Specify query variable if needed
 		if (choice != 0) {
 			statements[choice].setString(1, variable);
@@ -188,12 +198,20 @@ public class ResultSetTableModel extends AbstractTableModel {
 		// specify query and execute it
 		resultSet = statements[choice].executeQuery();
 
-		// obtain meta data for ResultSet
+		// obtain meta data for ResultSet and number of columns for generating variable results
 		metaData = resultSet.getMetaData();
+		int columnCount = metaData.getColumnCount();
 
-		// determine number of rows in ResultSet
-		resultSet.last(); // move to last row
-		numberOfRows = resultSet.getRow(); // get row number
+		// determine number of rows in ResultSet and store results in array list of array lists
+		numberOfRows = 0;
+		while (resultSet.next()) {
+			ArrayList<Object> row = new ArrayList<>();
+			for (int i = 0; i < columnCount; i++) {
+				row.add(resultSet.getObject(i + 1));
+			}
+			results.add(row);
+			numberOfRows++;
+		}
 
 		// notify JTable that model has changed
 		fireTableStructureChanged();
