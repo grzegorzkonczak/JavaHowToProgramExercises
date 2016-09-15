@@ -1,5 +1,5 @@
-// Grzegorz Koñczak, 14.09.2016
-// Exercise number 24.2 page 1146
+// Grzegorz Koñczak, 14/15.09.2016
+// Exercise number 24.2/3 page 1146/1147
 // Exercise from Java:How to program 10th edition
 
 package chapter24;
@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 // ResultSet rows and columns are counted from 1 and JTable 
@@ -34,15 +35,18 @@ public class ResultSetTableModel extends AbstractTableModel {
 	private PreparedStatement selectAllAuthors;
 	private PreparedStatement selectAuthor;
 	private PreparedStatement selectTitle;
+	private PreparedStatement addAuthor;
+	private PreparedStatement addTitle;
+	private PreparedStatement editAuthor;
+	private PreparedStatement link;
 
 	// Array for holding prepared statement objects
-	private PreparedStatement[] statements = new PreparedStatement[3];
+	private PreparedStatement[] statements = new PreparedStatement[7];
 
 	// keep track of database connection status
 	private boolean connectedToDatabase = false;
 
-	// constructor initializes resultSet and obtains its meta data object;
-	// determines number of rows
+	// constructor creates all prepared statements and initializes default query executed on application start
 	public ResultSetTableModel(String url, String username, String password, String query) throws SQLException {
 		// connect to database
 		connection = DriverManager.getConnection(url, username, password);
@@ -66,10 +70,28 @@ public class ResultSetTableModel extends AbstractTableModel {
 						+ "WHERE title LIKE ? ORDER BY LastName, FirstName",
 				ResultSet.CONCUR_READ_ONLY, ResultSet.TYPE_SCROLL_INSENSITIVE);
 
+		// create statement that adds new author to database
+		addAuthor = connection.prepareStatement("INSERT INTO authors " + "(FirstName, LastName) " + "VALUES (?, ?)");
+
+		// create statement that adds new title to database
+		addTitle = connection
+				.prepareStatement("INSERT INTO titles (Title, EditionNumber, Copyright, ISBN) VALUES (?, ?, ?, ?)");
+
+		// create statement that edits existing author
+		editAuthor = connection.prepareStatement("UPDATE authors SET FirstName = ?, LastName = ? WHERE authorID = ?");
+
+		// create statement that links author with title by inserting proper
+		// values to authorISBN table
+		link = connection.prepareStatement("INSERT INTO authorISBN (authorID, isbn) VALUES (?, ?)");
+
 		// populate statements array
 		statements[0] = selectAllAuthors;
 		statements[1] = selectAuthor;
 		statements[2] = selectTitle;
+		statements[3] = addAuthor;
+		statements[4] = addTitle;
+		statements[5] = editAuthor;
+		statements[6] = link;
 
 		// create Statement to query database
 		statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -185,7 +207,7 @@ public class ResultSetTableModel extends AbstractTableModel {
 	public void setQuery(Integer choice, String variable) throws SQLException, IllegalStateException {
 		// initialize new Array List for storing results
 		results = new ArrayList<>();
-		
+
 		// ensure database connection is available
 		if (!connectedToDatabase)
 			throw new IllegalStateException("Not Connected to Database");
@@ -198,11 +220,13 @@ public class ResultSetTableModel extends AbstractTableModel {
 		// specify query and execute it
 		resultSet = statements[choice].executeQuery();
 
-		// obtain meta data for ResultSet and number of columns for generating variable results
+		// obtain meta data for ResultSet and number of columns for generating
+		// variable results
 		metaData = resultSet.getMetaData();
 		int columnCount = metaData.getColumnCount();
 
-		// determine number of rows in ResultSet and store results in array list of array lists
+		// determine number of rows in ResultSet and store results in array list
+		// of array lists
 		numberOfRows = 0;
 		while (resultSet.next()) {
 			ArrayList<Object> row = new ArrayList<>();
@@ -215,6 +239,53 @@ public class ResultSetTableModel extends AbstractTableModel {
 
 		// notify JTable that model has changed
 		fireTableStructureChanged();
+	}
+
+	public void update(int option, List<String> variables) throws SQLException {
+		int count = 0;
+		String message = "";
+		// ensure database connection is available
+		if (!connectedToDatabase)
+			throw new IllegalStateException("Not Connected to Database");
+
+		switch (option) {
+		// Adding new author
+		case 3:
+			statements[option].setString(1, variables.get(0));
+			statements[option].setString(2, variables.get(1));
+			count = statements[option].executeUpdate();
+			message = "Added " + count + " new author.";
+			JOptionPane.showMessageDialog(null, message, "Confirmation", JOptionPane.PLAIN_MESSAGE);
+			break;
+		// Adding new title
+		case 4:
+			statements[option].setString(1, variables.get(0));
+			statements[option].setInt(2, Integer.parseInt(variables.get(1)));
+			statements[option].setString(3, variables.get(2));
+			statements[option].setString(4, variables.get(3));
+			count = statements[option].executeUpdate();
+			message = "Added " + count + " new title.";
+			JOptionPane.showMessageDialog(null, message, "Confirmation", JOptionPane.PLAIN_MESSAGE);
+			break;
+		// Editing existing author
+		case 5:
+			statements[option].setString(1, variables.get(0));
+			statements[option].setString(2, variables.get(1));
+			statements[option].setInt(3, Integer.parseInt(variables.get(2)));
+			count = statements[option].executeUpdate();
+			message = "Edited " + count + " existing author.";
+			JOptionPane.showMessageDialog(null, message, "Confirmation", JOptionPane.PLAIN_MESSAGE);
+			break;
+		// Linking author with title
+		case 6:
+			statements[option].setString(1, variables.get(0));
+			statements[option].setString(2, variables.get(1));
+			count = statements[option].executeUpdate();
+			message = "Linked " + count + " author with book.";
+			JOptionPane.showMessageDialog(null, message, "Confirmation", JOptionPane.PLAIN_MESSAGE);
+			break;
+		}
+
 	}
 
 	// close Statement and Connection
@@ -233,4 +304,5 @@ public class ResultSetTableModel extends AbstractTableModel {
 			}
 		}
 	}
+
 }
