@@ -17,7 +17,6 @@ public class FileEncryptorDecryptorSampleData {
 		try {
 			output = new Formatter("toEncrypt.txt");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

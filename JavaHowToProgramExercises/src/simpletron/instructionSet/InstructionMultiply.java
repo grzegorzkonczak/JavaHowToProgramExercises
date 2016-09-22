@@ -11,7 +11,6 @@ public class InstructionMultiply extends InstructionAccumulator {
 
 	public InstructionMultiply(Integer operand, Memory memory, Accumulator accumulator) {
 		super(operand, memory, accumulator);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

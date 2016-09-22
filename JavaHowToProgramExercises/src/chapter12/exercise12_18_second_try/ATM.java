@@ -215,7 +215,6 @@ public class ATM extends JFrame {
 	}
 
 	public Keypad getKeypad() {
-		// TODO Auto-generated method stub
 		return keypad;
 	}
 } // end class ATM

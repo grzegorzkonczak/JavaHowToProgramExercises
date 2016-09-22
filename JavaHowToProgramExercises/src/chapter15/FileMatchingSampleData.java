@@ -18,7 +18,6 @@ public class FileMatchingSampleData {
 			outOldMaster = new Formatter("oldmast.txt");
 			outTransaction = new Formatter("trans.txt");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

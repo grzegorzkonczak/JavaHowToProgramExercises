@@ -359,7 +359,6 @@ public class Compiler {
 		smlArray[instructionCounter++] = 2100 + table.getLocation(storeVariable);
 	}
 
-	// TODO: finish implementing rest of operations
 	private int generateInstruction(int argument1, int argument2, char operator) {
 		if (operator == '+') {
 			smlArray[instructionCounter++] = 2000 + argument2;

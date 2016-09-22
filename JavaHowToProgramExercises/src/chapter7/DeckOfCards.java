@@ -59,7 +59,6 @@ public class DeckOfCards {
 	}
 
 	// Method for checking value of poker hand
-	// TODO Checks for combinations: two pair, straight, full house
 	public CardCombination checkHand(Card[] hand) {
 
 		// Check for possible flush
@@ -95,13 +94,13 @@ public class DeckOfCards {
 		// Check for straight
 		String[] faces = { "Ace", "Deuce", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack",
 				"Queen", "King" };
-		
+
 		// Sort the hand
 		int swapCounter = 0;
 		Card[] sortedHand = new Card[5];
-		for (int i = 0; i < faces.length; i++){
-			for (int j = 0; j < 5; j++){
-				if (faces[i] == hand[j].getFace()){
+		for (int i = 0; i < faces.length; i++) {
+			for (int j = 0; j < 5; j++) {
+				if (faces[i] == hand[j].getFace()) {
 					sortedHand[0 + swapCounter] = hand[j];
 					swapCounter++;
 				}
@@ -109,24 +108,22 @@ public class DeckOfCards {
 		}
 
 		// Check sorted hand for straight
-		for (int i = 0; i < 5; i++){
-			for (int j = 0; j < 9; j++){
-				if (sortedHand[i].getFace() == faces[j]){
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 9; j++) {
+				if (sortedHand[i].getFace() == faces[j]) {
 					int count = 0;
-					for (int k = 1; k < 5; k++){
-						if (sortedHand[k].getFace() == faces[j + k]){
+					for (int k = 1; k < 5; k++) {
+						if (sortedHand[k].getFace() == faces[j + k]) {
 							count++;
 						}
 					}
-					if (count == 4 ||
-							((sortedHand[0].getFace() == "Ten") && (sortedHand[4].getFace() == "Ace"))){
+					if (count == 4 || ((sortedHand[0].getFace() == "Ten") && (sortedHand[4].getFace() == "Ace"))) {
 						return CardCombination.STRAIGHT;
 					}
 				}
 			}
 		}
-		
-		
+
 		// Check for full house
 		boolean isFull = false;
 		for (int i = 0; i < 5; i++) {

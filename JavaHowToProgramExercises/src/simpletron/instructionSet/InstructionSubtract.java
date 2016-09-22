@@ -11,7 +11,6 @@ public class InstructionSubtract extends InstructionAccumulator {
 
 	public InstructionSubtract(Integer operand, Memory memory, Accumulator accumulator) {
 		super(operand, memory, accumulator);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
