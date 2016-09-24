@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 
 public class CheckersClient extends JFrame implements Runnable {
 
-	private JTextField idField; // textfield to display players color
+	private JTextField idField; // text field to display players color
 	private JTextArea displayArea; // JTextArea to display output
 	private JPanel boardPanel; // panel for checkers board
 	private JPanel panel2; // panel to hold board
@@ -40,6 +40,7 @@ public class CheckersClient extends JFrame implements Runnable {
 	private String checkersHost; // host name for host
 	private String myColor; // this clients color
 	private boolean myTurn; // determines which client's turn it is
+	private Integer[] pieceToRelocate = new Integer[2]; // stores location of player piece that changes place
 	private final String WHITE_COLOR = "W"; // color for first client
 	private final String BLACK_COLOR = "B"; // color for second client
 
@@ -55,7 +56,7 @@ public class CheckersClient extends JFrame implements Runnable {
 
 		board = new Square[8][8]; // create board
 
-		idField = new JTextField(); // set up textfield
+		idField = new JTextField(); // set up text field
 		idField.setEditable(false);
 		add(idField, BorderLayout.NORTH);
 
@@ -63,7 +64,7 @@ public class CheckersClient extends JFrame implements Runnable {
 		panel2.add(boardPanel, BorderLayout.CENTER); // add board panel
 		add(panel2, BorderLayout.CENTER); // add container panel
 
-		setSize(300, 225); // set size of window
+		setSize(400, 400); // set size of window
 		setVisible(true); // show window
 
 		startClient();
@@ -97,20 +98,50 @@ public class CheckersClient extends JFrame implements Runnable {
 			// loop over the columns in the board
 			for (int column = 0; column < board[row].length; column += 2) {
 				// create square
-				int location = row * 8 + column; // determine location of square
+				Integer[] location1 = {row, column}; // determine location of square
 													// that's created
-				
-				// create board with checkers pattern
-				if (location  % 2 == 0 && row % 2 == 0) {
-					board[row][column] = new Square("", location, Color.LIGHT_GRAY);
-					boardPanel.add(board[row][column]); // add square
-					board[row][column] = new Square("", location + 1, Color.WHITE);
-					boardPanel.add(board[row][column]); // add square
+				Integer[] location2 = {row, column + 1};
+
+				// create board with checkers pattern and with pieces on it
+				if (row < 3) {
+					// create board with white pieces
+					if (column % 2 == 0 && row % 2 == 0) {
+						board[row][column] = new Square("", location1, Color.LIGHT_GRAY);
+						boardPanel.add(board[row][column]); // add square
+						board[row][column + 1] = new Square("W", location2, Color.WHITE);
+						boardPanel.add(board[row][column + 1]); // add square
+					} else {
+						board[row][column] = new Square("W", location1, Color.WHITE);
+						boardPanel.add(board[row][column]); // add square
+						board[row][column + 1] = new Square("", location2, Color.LIGHT_GRAY);
+						boardPanel.add(board[row][column + 1]); // add square
+					}
+				} else if (row > 4) {
+					// create board with black pieces
+					if (column % 2 == 0 && row % 2 == 0) {
+						board[row][column] = new Square("", location1, Color.LIGHT_GRAY);
+						boardPanel.add(board[row][column]); // add square
+						board[row][column + 1] = new Square("B", location2, Color.WHITE);
+						boardPanel.add(board[row][column + 1]); // add square
+					} else {
+						board[row][column] = new Square("B", location1, Color.WHITE);
+						boardPanel.add(board[row][column]); // add square
+						board[row][column + 1] = new Square("", location2, Color.LIGHT_GRAY);
+						boardPanel.add(board[row][column + 1]); // add square
+					}
 				} else {
-					board[row][column] = new Square("", location, Color.WHITE);
-					boardPanel.add(board[row][column]); // add square
-					board[row][column] = new Square("", location + 1, Color.LIGHT_GRAY);
-					boardPanel.add(board[row][column]); // add square
+					// create board without pieces
+					if (column % 2 == 0 && row % 2 == 0) {
+						board[row][column] = new Square("", location1, Color.LIGHT_GRAY);
+						boardPanel.add(board[row][column]); // add square
+						board[row][column + 1] = new Square("", location2, Color.WHITE);
+						boardPanel.add(board[row][column + 1]); // add square
+					} else {
+						board[row][column] = new Square("", location1, Color.WHITE);
+						boardPanel.add(board[row][column]); // add square
+						board[row][column + 1] = new Square("", location2, Color.LIGHT_GRAY);
+						boardPanel.add(board[row][column + 1]); // add square
+					}
 				}
 			}
 		}
@@ -142,22 +173,33 @@ public class CheckersClient extends JFrame implements Runnable {
 
 	// process messages received by client
 	private void processMessage(String message) {
-		// valid move occured
+		// valid move occurred
 		if (message.equals("Valid move.")) {
 			displayMessage("Valid move, please wait.\n");
-			setMark(currentSquare, myColor); // set mark in square TODO: change
-												// for checkers
+			removePieceFromBoard(board[pieceToRelocate[0]][pieceToRelocate[1]]); // remove piece from previous location
+			putPieceOnBoard(currentSquare, myColor); // set piece in new location 
+		} else if (message.equals("Where to move piece?.")) {
+			displayMessage(message + "\n");
+			myTurn = true; // still this client's turn
+			pieceToRelocate[0] = input.nextInt(); // get move location
+			pieceToRelocate[1] = input.nextInt();
+			input.nextLine(); // skip newline after int location
 		} else if (message.equals("Invalid move, try again")) {
 			displayMessage(message + "\n");
 			myTurn = true; // still this client's turn
-		} else if (message.equals("Opponent moved")) {
-			int location = input.nextInt(); // get move location
+		} else if (message.equals("Opponent choosed piece to move.")){
+			pieceToRelocate[0] = input.nextInt(); // get piece location
+			pieceToRelocate[1] = input.nextInt();
 			input.nextLine(); // skip newline after int location
-			int row = location / 8; // calculate row
-			int column = location % 8; // calculate column
+			displayMessage("Oppenent choosed piece at location " + pieceToRelocate[0] + ", " + pieceToRelocate[1] + "\n");
+		} else if (message.equals("Opponent moved")) {
+			int row = input.nextInt(); // get move location
+			int column = input.nextInt();
+			input.nextLine(); // skip newline after int location
 
-			// mark move TODO: reimplement for checkers
-			setMark(board[row][column], (myColor.equals(WHITE_COLOR) ? BLACK_COLOR : WHITE_COLOR));
+			// relocate piece
+			removePieceFromBoard(board[pieceToRelocate[0]][pieceToRelocate[1]]); // remove piece from previous location
+			putPieceOnBoard(board[row][column], (myColor.equals(WHITE_COLOR) ? BLACK_COLOR : WHITE_COLOR));
 			displayMessage("Oppenent moved. Your turn.\n");
 			myTurn = true; // now this client's turn
 		} else {
@@ -176,24 +218,33 @@ public class CheckersClient extends JFrame implements Runnable {
 		});
 	}
 
-	// utility method to set mark on board in event-dispatch thread
-	// TODO: reimplement for checkers
-	private void setMark(final Square squareToMark, final String mark) {
+	// utility method to set piece on board in event-dispatch thread
+	private void putPieceOnBoard(final Square squareToPut, final String piece) {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
-				squareToMark.setMark(mark); // set mark in square
+				squareToPut.setPiece(piece); // set mark in square
+			}
+		});
+	}
+	
+	private void removePieceFromBoard(final Square squareToPut) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				squareToPut.setPiece(""); // set mark in square
 			}
 		});
 	}
 
-	// send message to server indicating clicked squre
-	// TODO: reimplement for checkers
-	public void sendClickedSquare(int location) {
+	// send message to server indicating clicked square
+	public void sendClickedSquare(Integer[] location) {
 		// if it is my turn
 		if (myTurn) {
-			output.format("%d\n", location); // send location to server
+			output.format("%d\n", location[0]); // send location to server
+			output.format("%d\n", location[1]);
 			output.flush();
 			myTurn = false; // not my turn any more
 		}
@@ -207,10 +258,10 @@ public class CheckersClient extends JFrame implements Runnable {
 	// private inner class for the squares on the board
 	private class Square extends JPanel {
 		private String pieceColor; // set color of piece in that square
-		private Integer location; // location of square
+		private Integer[] location; // location of square
 		private Color squareColor; // color of square
 
-		public Square(String squarePieceColor, Integer squareLocation, Color squareColor) {
+		public Square(String squarePieceColor, Integer[] squareLocation, Color squareColor) {
 			pieceColor = squarePieceColor; // set piece color for this square
 			location = squareLocation; // set location of this square
 			this.squareColor = squareColor;
@@ -235,24 +286,23 @@ public class CheckersClient extends JFrame implements Runnable {
 			return getPreferredSize(); // return preferred size
 		}
 
-		// set Mark for Square
-		// TODO: reimplement for checkers
-		public void setMark(String newMark) {
-			pieceColor = newMark; // set mark of square
+		// set piece for Square
+		public void setPiece(String newPiece) {
+			pieceColor = newPiece; // set mark of square
 			repaint(); // repaint square
 		}
 
 		// return Square location
-		public int getSquareLocation() {
+		public Integer[] getSquareLocation() {
 			return location; // return location of square
 		}
 
 		// draw Square
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			g.setColor(squareColor);
-			g.fillRect(0, 0, 29, 29); // draw square
-			g.drawString(pieceColor, 11, 20); // draw mark
+			setBackground(squareColor);
+			g.drawRect(0, 0, 29, 29); // draw square
+			g.drawString(pieceColor, 11, 20); // draw piece
 		}
 	}
 }
