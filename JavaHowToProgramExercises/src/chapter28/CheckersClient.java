@@ -41,6 +41,7 @@ public class CheckersClient extends JFrame implements Runnable {
 	private String myColor; // this clients color
 	private boolean myTurn; // determines which client's turn it is
 	private Integer[] pieceToRelocate = new Integer[2]; // stores location of player piece that changes place
+	private Integer[] capturedPiece = new Integer[2]; // stores location of captured piece
 	private final String WHITE_COLOR = "W"; // color for first client
 	private final String BLACK_COLOR = "B"; // color for second client
 
@@ -178,20 +179,36 @@ public class CheckersClient extends JFrame implements Runnable {
 			displayMessage("Valid move, please wait.\n");
 			removePieceFromBoard(board[pieceToRelocate[0]][pieceToRelocate[1]]); // remove piece from previous location
 			putPieceOnBoard(currentSquare, myColor); // set piece in new location 
+			
+		// client captured piece of opponent
+		} else if (message.equals("You captured opponent piece.")) {
+			displayMessage("You captured opponent piece.\n");
+			capturedPiece[0] = input.nextInt(); // get capture location
+			capturedPiece[1] = input.nextInt();
+			input.nextLine(); // skip newline after int location
+			removePieceFromBoard(board[capturedPiece[0]][capturedPiece[1]]); // remove captured piece
+		
+		// choosing move end location
 		} else if (message.equals("Where to move piece?.")) {
 			displayMessage(message + "\n");
 			myTurn = true; // still this client's turn
 			pieceToRelocate[0] = input.nextInt(); // get move location
 			pieceToRelocate[1] = input.nextInt();
 			input.nextLine(); // skip newline after int location
+			
+		// Invalid move occured
 		} else if (message.equals("Invalid move, try again")) {
 			displayMessage(message + "\n");
 			myTurn = true; // still this client's turn
+			
+		// Opponent chose move end location
 		} else if (message.equals("Opponent choosed piece to move.")){
 			pieceToRelocate[0] = input.nextInt(); // get piece location
 			pieceToRelocate[1] = input.nextInt();
 			input.nextLine(); // skip newline after int location
 			displayMessage("Oppenent choosed piece at location " + pieceToRelocate[0] + ", " + pieceToRelocate[1] + "\n");
+			
+		// opponent moved
 		} else if (message.equals("Opponent moved")) {
 			int row = input.nextInt(); // get move location
 			int column = input.nextInt();
@@ -202,6 +219,35 @@ public class CheckersClient extends JFrame implements Runnable {
 			putPieceOnBoard(board[row][column], (myColor.equals(WHITE_COLOR) ? BLACK_COLOR : WHITE_COLOR));
 			displayMessage("Oppenent moved. Your turn.\n");
 			myTurn = true; // now this client's turn
+			
+		// opponent captured clients piece
+		} else if (message.equals("Opponent captured your piece.")){
+			capturedPiece[0] = input.nextInt(); // get piece location
+			capturedPiece[1] = input.nextInt();
+			input.nextLine(); // skip newline after int location
+			displayMessage("Oppenent captured piece at location " + capturedPiece[0] + ", " + capturedPiece[1] + "\n");
+			// relocate piece
+			removePieceFromBoard(board[capturedPiece[0]][capturedPiece[1]]); // remove captured piece
+			
+		// more captures possible for client
+		} else if (message.equals("More captures possible, still your turn.")){
+			displayMessage(message + "\n");
+			removePieceFromBoard(board[pieceToRelocate[0]][pieceToRelocate[1]]); // remove piece from previous location
+			putPieceOnBoard(currentSquare, myColor); // set piece in new location 
+			myTurn = true;
+			
+		// opponent moved and still has moves
+		}else if (message.equals("Opponent moved but still has moves.")){
+			int row = input.nextInt(); // get move location
+			int column = input.nextInt();
+			input.nextLine(); // skip newline after int location
+
+			// relocate piece
+			removePieceFromBoard(board[pieceToRelocate[0]][pieceToRelocate[1]]); // remove piece from previous location
+			putPieceOnBoard(board[row][column], (myColor.equals(WHITE_COLOR) ? BLACK_COLOR : WHITE_COLOR));
+			displayMessage(message + "\n");
+			
+		// other message
 		} else {
 			displayMessage(message + "\n");
 		}

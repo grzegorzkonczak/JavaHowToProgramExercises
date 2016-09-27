@@ -37,6 +37,10 @@ public class CheckersServer extends JFrame {
 	private Lock gameLock; // to lock game for synchronization
 	private Condition otherPlayerConnected; // to wait for other player
 	private Condition otherPlayerTurn; // to wait for other player's turn
+	private boolean captureOccurred = false; // if there was capture in players move
+	private Integer[] captureLocation = {0, 0}; // stores location of captured piece
+	private boolean captureIndicator = false; // indicates that move should be capture move at the end of player turn
+	private boolean nextCapturePossible = false; // indicates that more captures are possible for player
 
 	// set up checkers server and GUI that displays messages
 	public CheckersServer() {
@@ -153,7 +157,6 @@ public class CheckersServer extends JFrame {
 	}
 
 	// determine if move is valid
-	// TODO: Reimplement validation method for checkers game
 	public boolean validateStartLocation(Integer[] location, Integer player) {
 		// while not current player, must wait for turn
 		while (player != currentPlayer) {
@@ -167,16 +170,17 @@ public class CheckersServer extends JFrame {
 				gameLock.unlock(); // unlock game after waiting
 			}
 		}
-
+		
 		// check if move can be capture move
 		if (isCaptureMove(location, player)) {
 			players[notCurrentPlayer].otherPlayerChoosedPiece(location);
+			captureIndicator = true;
 			return true; // notify player that move was valid
 			// check if capture move is possible for player
-		} else if (!isCapturePossible(location, player)) {
+		} else if (isCapturePossibleForPlayer(player)) {
 			return false; // notify player that move was invalid
 		} else {
-			if (isPlayerPiece(location)) {
+			if (isPlayerPiece(location, player)) {
 				players[notCurrentPlayer].otherPlayerChoosedPiece(location);
 				return true; // notify player that move was valid
 			} else { // move was not valid
@@ -185,84 +189,110 @@ public class CheckersServer extends JFrame {
 		}
 	}
 
-	// check if there are possible capture moves on board
-	private boolean isCapturePossible(Integer[] location, Integer player) {
-		if (isPlayerPiece(location)) {
-			if (isCapturePossibleForPlayer(player)) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		return false;
-	}
 
 	// check if there are possible capture moves on board for particular player
 	private boolean isCapturePossibleForPlayer(Integer player) {
-		if (player == PLAYER_WHITE) {
-			// loop all rows
-			for (int row = 0; row < board.length; row++) {
-				// loop all columns
-				for (int column = 0; column < board[row].length; column++) {
-					if () // TODO: implement check for possible capture on board
+		Integer[] location = new Integer[2];
+		// loop all rows
+		for (int row = 0; row < board.length; row++) {
+			// loop all columns
+			for (int column = 0; column < board[row].length; column++) {
+				location[0] = row;
+				location[1] = column;
+				if (isCaptureMove(location, player)){ // check if capture possible at this location
+					return true; // possible capture present on board
 				}
 			}
-		} else {
-
 		}
-		return false;
+		return false; // no possible captures on board
 	}
 
-	// check if start location has potential for capture
+	// check if location has potential for capture
 	private boolean isCaptureMove(Integer[] location, Integer player) {
-		// check if piece is player piece
-		if (isPlayerPiece(location)) {
-			// check if piece s not near border
-			if (borderCheck(location)) { // TODO: border check must be more specific...
-				// check diagonal lower left for WHITE player
-				if (board[location[0] - 1][location[1] - 1].equals("B")
-						&& (board[location[0] - 2][location[1] - 2].equals(""))) {
+		Integer row = location[0];
+		Integer column = location[1];
+		// if player white check for possible capture of that piece and
+		// if found return true
+		if (player == PLAYER_WHITE){
+			if (isPlayerPiece(location, player)) { // check if player piece
+				if ((borderCheck(location, 1) // check if lower left direction is not near border
+						&& (board[row + 1][column - 1].equals(pieceColors[PLAYER_BLACK]) // check if lower left has opponent piece
+						&& (board[row + 2][column - 2].equals("")))) // check if after opponent piece there is free space
+						|| (borderCheck(location, 2) // check if lower right direction is not near border
+						&& (board[row + 1][column + 1].equals(pieceColors[PLAYER_BLACK])) // check if lower right has opponent piece
+						&& (board[row + 2][column + 2].equals("")))) { // check if after opponent piece there is free space
 					return true;
 				}
-				// check diagonal lower right for WHITE player
-				if (board[location[0] - 1][location[1] + 1].equals("B")
-						&& (board[location[0] - 2][location[1] + 2].equals(""))) {
+			}
+		// if player black check for possible capture of that piece
+		// and if found return true
+		} else if (player == PLAYER_BLACK){
+			if (isPlayerPiece(location, player)) { // check if player piece
+				if ((borderCheck(location, 3) // check if upper left direction is not near border
+						&& (board[row - 1][column - 1].equals(pieceColors[PLAYER_WHITE]) // check if upper left has opponent piece
+						&& (board[row - 2][column - 2].equals("")))) // check if after opponent piece there is free space
+						|| (borderCheck(location, 4) // check if upper right direction is not near border
+						&& (board[row - 1][column + 1].equals(pieceColors[PLAYER_WHITE])) // check if upper right has opponent piece
+						&& (board[row - 2][column + 2].equals("")))) { // check if after opponent piece there is free space
 					return true;
 				}
-				// check diagonal upper left for BLACK player
-				if (board[location[0] + 1][location[1] - 1].equals("W")
-						&& (board[location[0] + 2][location[1] - 2].equals(""))) {
-					return true;
-				}
-				// check diagonal upper right for BLACK player
-				if (board[location[0] + 1][location[1] - 1].equals("W")
-						&& (board[location[0] + 2][location[1] + 2].equals(""))) {
-					return true;
-				}
-			} else {
-				return false; // notify player that move was invalid
 			}
 		}
-		return false; // notify player that move was invalid
+		return false; // notify player that move is not capture move
 	}
 
-	private boolean borderCheck(Integer[] location) {
-		
-		return false;
+	private boolean borderCheck(Integer[] location, Integer checkDirection) {
+		Integer row = location[0];
+		Integer column = location[1];
+		switch (checkDirection) {
+		// check lower left direction for border
+		case 1:
+			if (row + 2 >= board.length || column - 2 < 0){
+				return false; // out of border
+			}
+			break;
+		// check lower right direction for border
+		case 2:
+			if (row + 2 >= board.length || column + 2 >= board[0].length){
+				return false; // out of border
+			}
+			break;
+		// check upper left direction for border
+		case 3:
+			if (row - 2 < 0 || column - 2 < 0){
+				return false; // out of border
+			}
+			break;
+		// check upper right direction for border
+		case 4:
+			if (row - 2 < 0 || column + 2 >= board[0].length){
+				return false; // out of border
+			}
+			break;
+		}
+		return true; // checking this move will not go out of border
 	}
 
-	public boolean validateEndLocation(Integer[] location, Integer player) {
+	public boolean validateEndLocation(Integer[] startLocation, Integer[] endLocation, Integer player) {
 		// if move is valid move piece to new location
-		if (isMoveValid(location)) {
-			board[location[0]][location[1]] = pieceColors[currentPlayer]; // set
-																			// move
-																			// on
-																			// board
+		if (isMoveValid(startLocation, endLocation)) {
+			// update board on server
+			board[startLocation[0]][startLocation[1]] = "";
+			board[endLocation[0]][endLocation[1]] = pieceColors[currentPlayer];
+			if (captureOccurred){
+				board[captureLocation[0]][captureLocation[1]] = ""; // take captured piece off board
+				players[notCurrentPlayer].otherPlayerCaptured(captureLocation); // let opponent know that his piece was captured
+				if (isCaptureMove(endLocation, player)){ // check if more captures for player is possible
+					players[notCurrentPlayer].moreCapturesForOpponent(endLocation); // let opponent know that more captures are possible
+					nextCapturePossible = true;
+					return false;
+				}
+			}
 			currentPlayer = (currentPlayer + 1) % 2; // change player
 			notCurrentPlayer = (notCurrentPlayer + 1) % 2; // change player
 
 			// let new current player know that move occurred
-			players[currentPlayer].otherPlayerMoved(location);
+			players[currentPlayer].otherPlayerMoved(endLocation);
 
 			gameLock.lock(); // lock game to signal other player to go
 
@@ -278,16 +308,102 @@ public class CheckersServer extends JFrame {
 		}
 	}
 
-	private boolean isMoveValid(Integer[] location) {
-		// TODO implement move validation
-		return true;
+	private boolean isMoveValid(Integer[] startLocation, Integer[] endLocation) {
+		if (isSquareOccupied(endLocation)){ // check if end destination is not occupied
+			return false; // invalid move
+		} else if (isCapture(startLocation, endLocation)){ // check if move is capture move
+			return true; // valid move
+		// if move should be capture but is not (started capture, ended as plain diagonal move) - return false
+		}else if (captureIndicator){
+			return false; // invalid move
+		} else if (isMoveDiagonal(startLocation, endLocation)){ // check if move is diagonal in forward direction for current player
+			return true; // valid move
+		}
+		return false; // invalid move
+	}
+
+	private boolean isMoveDiagonal(Integer[] startLocation, Integer[] endLocation) {
+		Integer startRow = startLocation[0];
+		Integer startColumn = startLocation[1];
+		Integer endRow = endLocation[0];
+		Integer endColumn = endLocation[1];
+		
+		// check if move is diagonal specific for white player without capture
+		if (currentPlayer == PLAYER_WHITE){
+			if (startRow + 1 == endRow && (startColumn - 1 == endColumn || startColumn + 1 == endColumn) ){
+				return true;
+			}
+		// check if move is diagonal specific for white player without capture
+		} else {
+			if (startRow - 1 == endRow && (startColumn - 1 == endColumn || startColumn + 1 == endColumn) ){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isCapture(Integer[] startLocation, Integer[] endLocation) {
+		Integer startRow = startLocation[0];
+		Integer startColumn = startLocation[1];
+		Integer endRow = endLocation[0];
+		Integer endColumn = endLocation[1];
+		// check capture for player white
+		if (currentPlayer == PLAYER_WHITE){
+			// check lower left capture possibility
+			if (startRow + 2 == endRow && startColumn - 2 == endColumn 
+					&& board[startRow + 1][startColumn - 1].equals(pieceColors[PLAYER_BLACK])){
+				captureOccurred = true; // indicate that capture occurred
+				
+				// store capture location
+				captureLocation[0] = startRow + 1;
+				captureLocation[1] = startColumn - 1;
+				return true;
+			// check lower right capture possibility
+			} else if (startRow + 2 == endRow && startColumn + 2 == endColumn 
+					&& board[startRow + 1][startColumn + 1].equals(pieceColors[PLAYER_BLACK])){
+				captureOccurred = true; // indicate that capture occurred
+				
+				// store capture location
+				captureLocation[0] = startRow + 1;
+				captureLocation[1] = startColumn + 1;
+				return true;
+			}
+		// check capture for player black
+		} else {
+			// check upper left capture possibility
+			if (startRow - 2 == endRow && startColumn - 2 == endColumn 
+					&& board[startRow - 1][startColumn - 1].equals(pieceColors[PLAYER_WHITE])){
+				captureOccurred = true; // indicate that capture occurred
+				
+				// store capture location
+				captureLocation[0] = startRow - 1;
+				captureLocation[1] = startColumn - 1;
+				return true;
+			// check upper right capture possibility
+			} else if (startRow - 2 == endRow && startColumn + 2 == endColumn 
+					&& board[startRow - 1][startColumn + 1].equals(pieceColors[PLAYER_WHITE])){
+				captureOccurred = true; // indicate that capture occurred
+				
+				// store capture location
+				captureLocation[0] = startRow - 1;
+				captureLocation[1] = startColumn + 1;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// determine if square is not occupied by another piece
+	private boolean isSquareOccupied(Integer[] endLocation) {
+		if (board[endLocation[0]][endLocation[1]].equals("")){
+			return false; // square is free
+		}
+		return true; // square is occupied
 	}
 
 	// determine whether player wants to move his piece
-	public boolean isPlayerPiece(Integer[] location) {
-		if ((board[location[0]][location[1]].equals(pieceColors[PLAYER_WHITE]) && currentPlayer == PLAYER_WHITE)
-				|| (board[location[0]][location[1]].equals(pieceColors[PLAYER_BLACK])
-						&& currentPlayer == PLAYER_BLACK)) {
+	public boolean isPlayerPiece(Integer[] location, Integer player) {
+		if ((board[location[0]][location[1]].equals(pieceColors[player]) && currentPlayer == player)){
 			return true; // player wants to move his piece
 		} else {
 			return false; // player wants to move not his piece
@@ -360,46 +476,68 @@ public class CheckersServer extends JFrame {
 
 				// while game not over
 				while (!isGameOver()) {
-					Integer[] location = { 0, 0 }; // initialize move location
+					Integer[] startLocation = { 0, 0 }; // initialize move start location
+					Integer[] endLocation = {0, 0}; // initialize move end location
+					// reset capture information
+					captureOccurred = false;
+					captureIndicator = false;
+					nextCapturePossible = false;
 
 					if (input.hasNext()) {
-						location[0] = input.nextInt(); // get move location
-						location[1] = input.nextInt();
+						startLocation[0] = input.nextInt(); // get move location
+						startLocation[1] = input.nextInt();
 					}
 
 					// check for valid move
-					if (validateStartLocation(location, playerNumber)) {
-						displayMessage("\npiece start location: " + location[0] + ", " + location[1]);
+					if (validateStartLocation(startLocation, playerNumber)) {
+						displayMessage("\npiece start location: " + startLocation[0] + ", " + startLocation[1]);
 						output.format("Where to move piece?.\n"); // ask client
 																	// for
 																	// destination
 																	// of move
 						output.flush();
-						output.format("%d\n", location[0]); // send location of
+						output.format("%d\n", startLocation[0]); // send location of
 															// move
-						output.format("%d\n", location[1]); // send location of
+						output.format("%d\n", startLocation[1]); // send location of
 															// move
 						output.flush();
 
 						// get piece destination location
-						location[0] = input.nextInt();
-						location[1] = input.nextInt();
+						endLocation[0] = input.nextInt();
+						endLocation[1] = input.nextInt();
 
 						// validate piece end location
-						if (validateEndLocation(location, playerNumber)) {
-							displayMessage("\npiece end location: " + location[0] + ", " + location[1]);
+						if (validateEndLocation(startLocation, endLocation, playerNumber)) {
+							if (captureOccurred){
+								displayMessage("\ncaptured piece: " + captureLocation[0] + ", " + captureLocation[1]);
+								output.format("You captured opponent piece.\n"); // notify client
+								output.format("%d\n", captureLocation[0]); // send location of move
+								output.format("%d\n", captureLocation[1]); // send location of move
+								output.flush();
+							}
+							displayMessage("\npiece end location: " + endLocation[0] + ", " + endLocation[1]);
 							output.format("Valid move.\n"); // notify client
 							output.flush();
-						} else { // move was invalid
+						} else { // move was invalid or there were capture and more captures  are possible
+							if (nextCapturePossible){
+								displayMessage("\ncaptured piece: " + captureLocation[0] + ", " + captureLocation[1]);
+								output.format("You captured opponent piece.\n"); // notify client
+								output.format("%d\n", captureLocation[0]); // send location of move
+								output.format("%d\n", captureLocation[1]); // send location of move
+								output.flush();
+								output.format("More captures possible, still your turn.\n"); // notify client that he has next move
+								output.flush();
+							} else {
+								output.format("Invalid move, try again\n");
+								output.flush();
+							}
+						}
+						
+					} else { // move was invalid
 							output.format("Invalid move, try again\n");
 							output.flush();
 						}
-
-					} else { // move was invalid
-						output.format("Invalid move, try again\n");
-						output.flush();
 					}
-				}
 			} finally {
 				try {
 					connection.close(); // close connection to client
@@ -430,5 +568,23 @@ public class CheckersServer extends JFrame {
 			output.format("%d\n", location[1]); // send location of move
 			output.flush();
 		}
+		
+		// send message that other player captured piece
+		public void otherPlayerCaptured(Integer[] captureLocation) {
+			output.format("Opponent captured your piece.\n");
+			output.format("%d\n", captureLocation[0]); // send location of capture
+			output.format("%d\n", captureLocation[1]); // send location of capture
+			output.flush();
+			
+		}
+		
+		// send message that more capture for opponent possible
+		public void moreCapturesForOpponent(Integer[] location) {
+			output.format("Opponent moved but still has moves.\n");
+			output.format("%d\n", location[0]); // send location of move
+			output.format("%d\n", location[1]); // send location of move
+			output.flush();
+		}
+		
 	}
 }
