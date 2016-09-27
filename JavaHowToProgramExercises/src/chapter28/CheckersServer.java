@@ -56,7 +56,8 @@ public class CheckersServer extends JFrame {
 
 		players = new Player[2]; // create array of players
 		currentPlayer = PLAYER_WHITE; // set current player to first player
-		notCurrentPlayer = PLAYER_BLACK; // set not current player to second player
+		notCurrentPlayer = PLAYER_BLACK; // set not current player to second
+											// player
 
 		try {
 			server = new ServerSocket(12345, 2); // set up ServerSocket
@@ -167,13 +168,87 @@ public class CheckersServer extends JFrame {
 			}
 		}
 
-		// if location has player piece return true
-		if (isPlayerPiece(location)) {
+		// check if move can be capture move
+		if (isCaptureMove(location, player)) {
 			players[notCurrentPlayer].otherPlayerChoosedPiece(location);
 			return true; // notify player that move was valid
-		} else { // move was not valid
+			// check if capture move is possible for player
+		} else if (!isCapturePossible(location, player)) {
 			return false; // notify player that move was invalid
+		} else {
+			if (isPlayerPiece(location)) {
+				players[notCurrentPlayer].otherPlayerChoosedPiece(location);
+				return true; // notify player that move was valid
+			} else { // move was not valid
+				return false; // notify player that move was invalid
+			}
 		}
+	}
+
+	// check if there are possible capture moves on board
+	private boolean isCapturePossible(Integer[] location, Integer player) {
+		if (isPlayerPiece(location)) {
+			if (isCapturePossibleForPlayer(player)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	// check if there are possible capture moves on board for particular player
+	private boolean isCapturePossibleForPlayer(Integer player) {
+		if (player == PLAYER_WHITE) {
+			// loop all rows
+			for (int row = 0; row < board.length; row++) {
+				// loop all columns
+				for (int column = 0; column < board[row].length; column++) {
+					if () // TODO: implement check for possible capture on board
+				}
+			}
+		} else {
+
+		}
+		return false;
+	}
+
+	// check if start location has potential for capture
+	private boolean isCaptureMove(Integer[] location, Integer player) {
+		// check if piece is player piece
+		if (isPlayerPiece(location)) {
+			// check if piece s not near border
+			if (borderCheck(location)) { // TODO: border check must be more specific...
+				// check diagonal lower left for WHITE player
+				if (board[location[0] - 1][location[1] - 1].equals("B")
+						&& (board[location[0] - 2][location[1] - 2].equals(""))) {
+					return true;
+				}
+				// check diagonal lower right for WHITE player
+				if (board[location[0] - 1][location[1] + 1].equals("B")
+						&& (board[location[0] - 2][location[1] + 2].equals(""))) {
+					return true;
+				}
+				// check diagonal upper left for BLACK player
+				if (board[location[0] + 1][location[1] - 1].equals("W")
+						&& (board[location[0] + 2][location[1] - 2].equals(""))) {
+					return true;
+				}
+				// check diagonal upper right for BLACK player
+				if (board[location[0] + 1][location[1] - 1].equals("W")
+						&& (board[location[0] + 2][location[1] + 2].equals(""))) {
+					return true;
+				}
+			} else {
+				return false; // notify player that move was invalid
+			}
+		}
+		return false; // notify player that move was invalid
+	}
+
+	private boolean borderCheck(Integer[] location) {
+		
+		return false;
 	}
 
 	public boolean validateEndLocation(Integer[] location, Integer player) {
@@ -300,14 +375,16 @@ public class CheckersServer extends JFrame {
 																	// destination
 																	// of move
 						output.flush();
-						output.format("%d\n", location[0]); // send location of move
-						output.format("%d\n", location[1]); // send location of move
+						output.format("%d\n", location[0]); // send location of
+															// move
+						output.format("%d\n", location[1]); // send location of
+															// move
 						output.flush();
-						
+
 						// get piece destination location
 						location[0] = input.nextInt();
 						location[1] = input.nextInt();
-						
+
 						// validate piece end location
 						if (validateEndLocation(location, playerNumber)) {
 							displayMessage("\npiece end location: " + location[0] + ", " + location[1]);
@@ -345,7 +422,7 @@ public class CheckersServer extends JFrame {
 			output.format("%d\n", location[1]); // send location of move
 			output.flush();
 		}
-		
+
 		// send message that other player moved
 		public void otherPlayerChoosedPiece(Integer[] location) {
 			output.format("Opponent choosed piece to move.\n");
